@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ReptilianHQ/launch-on-block-sdk/blob/main/schemas/contract-artifact-handoff.schema.json",
+  "title": "Launch On Block contract artifact handoff",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "producerId",
+    "releaseId",
+    "chainId",
+    "deploymentId",
+    "startBlock",
+    "abiRevision",
+    "artifacts"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "producerId": { "const": "launch-on-block-contracts" },
+    "releaseId": { "type": "string", "minLength": 1 },
+    "chainId": { "type": "integer", "minimum": 1 },
+    "deploymentId": { "type": "string", "minLength": 1 },
+    "startBlock": { "type": "integer", "minimum": 0 },
+    "abiRevision": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": { "type": "string", "pattern": "^(src/generated|artifacts)/[A-Za-z0-9._/-]+$" },
+          "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    }
+  }
+}

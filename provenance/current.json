@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "producerId": "launch-on-block-contracts",
+  "releaseId": "gen-12",
+  "chainId": 4663,
+  "deploymentId": "4663:launchpad:0x135492b3ccb2cb64749f91332f929f49a1deed3f:17957183",
+  "startBlock": 17957183,
+  "abiRevision": "sha256:635cf660979631c57c4fa5cdf28460f8a4293272ebe153f0064e3758c6a5b9be",
+  "artifacts": [
+    {
+      "path": "src/generated/abis.ts",
+      "sha256": "dd3e9038251ae3a79f4164e394494083c1aa797ca459c18575354d09033cdbe3"
+    },
+    {
+      "path": "src/generated/deployments.ts",
+      "sha256": "2184e4e6f4be4c47d1c45c8122f920d8dd9273e3a98fec4911ae3c3c2a94b519"
+    }
+  ]
+}

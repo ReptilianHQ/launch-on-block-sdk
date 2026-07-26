@@ -1,0 +1,26 @@
+name: Release candidate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: mkdir -p release
+      - run: npm pack --pack-destination release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: launch-on-block-sdk-${{ github.sha }}
+          path: release/*.tgz
+          if-no-files-found: error

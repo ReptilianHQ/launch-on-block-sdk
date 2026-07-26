@@ -1,0 +1,82 @@
+{
+  "name": "@reptilianhq/launch-on-block-sdk",
+  "version": "0.4.0",
+  "description": "Public TypeScript SDK, contract interfaces, ABIs, and deployment metadata for integrating with the Launch On Block protocol.",
+  "launchpadRelease": {
+    "network": "mainnet",
+    "releaseId": "gen-12",
+    "manifest": "deployments/robinhood-mainnet-gen-12.json"
+  },
+  "license": "GPL-3.0-only",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ReptilianHQ/launch-on-block-sdk.git"
+  },
+  "homepage": "https://github.com/ReptilianHQ/launch-on-block-sdk#readme",
+  "bugs": {
+    "url": "https://github.com/ReptilianHQ/launch-on-block-sdk/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./abis": {
+      "types": "./dist/abis.d.ts",
+      "import": "./dist/abis.js"
+    },
+    "./deployments": {
+      "types": "./dist/deployments.d.ts",
+      "import": "./dist/deployments.js"
+    },
+    "./errors": {
+      "types": "./dist/errors.d.ts",
+      "import": "./dist/errors.js"
+    },
+    "./economics": {
+      "types": "./dist/economics.d.ts",
+      "import": "./dist/economics.js"
+    },
+    "./transactions": {
+      "types": "./dist/transactions.d.ts",
+      "import": "./dist/transactions.js"
+    },
+    "./receipts": {
+      "types": "./dist/receipts.d.ts",
+      "import": "./dist/receipts.js"
+    },
+    "./compatibility": {
+      "types": "./dist/compatibility.d.ts",
+      "import": "./dist/compatibility.js"
+    }
+  },
+  "scripts": {
+    "clean": "rm -rf dist",
+    "check": "npm run check:artifacts && npm run build && npm run test:unit && npm run test:pack",
+    "check:artifacts": "node scripts/check-artifacts.mjs",
+    "build": "npm run clean && tsc -p tsconfig.json",
+    "prepack": "npm run build",
+    "test": "npm run check",
+    "test:unit": "tsc -p tsconfig.test.json && vitest run",
+    "test:pack": "node scripts/pack.mjs",
+    "verify:deployment": "npm run build && node scripts/verify-deployment.mjs"
+  },
+  "peerDependencies": {
+    "viem": ">=2.21.0 <3"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "viem": "^2.55.2",
+    "vitest": "4.1.10"
+  }
+}
