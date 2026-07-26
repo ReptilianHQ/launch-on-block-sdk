@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.4.3
 
 - Isolate registry integrity verification in a retryable post-publish job and tolerate npm propagation delay.
+- Prove the corrected trusted-publishing workflow through a no-API-change release.
 
 ## 0.4.2
 
