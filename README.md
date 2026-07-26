@@ -18,9 +18,10 @@ authorization model.
 
 ## Installation
 
-The successor package is `@reptilianhq/launch-on-block-sdk`. Registry publication will be enabled only
-after the public package namespace and release ceremony are configured. Until then, repository checks
-produce a complete npm tarball that consumers can evaluate without publishing it.
+The successor package is `@reptilianhq/launch-on-block-sdk`. Registry publication is fail-closed until
+the public npm scope, public GitHub source, protected release environment, and npm trusted publisher are
+configured. Until then, repository checks produce a complete npm tarball that consumers can evaluate
+without publishing it. See [`docs/RELEASING.md`](docs/RELEASING.md).
 
 Version `0.4.0` establishes the initial public package API in this dedicated repository.
 

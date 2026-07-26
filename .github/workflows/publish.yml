@@ -1,0 +1,70 @@
+name: Publish SDK
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: startsWith(github.event.release.tag_name, 'v')
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - name: Require a public provenance source
+        run: test "${{ github.event.repository.private }}" = false
+      - name: Verify release identity
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          git merge-base --is-ancestor "$GITHUB_SHA" origin/main
+          test "$(git rev-parse "$RELEASE_TAG^{commit}")" = "$GITHUB_SHA"
+          node -e 'const packageJson = require("./package.json"); const tag = `v${packageJson.version}`; if (process.env.RELEASE_TAG !== tag) throw new Error(`expected release tag ${tag}`); if (packageJson.version.includes("-") !== (process.env.RELEASE_PRERELEASE === "true")) throw new Error("release prerelease state does not match package version");'
+      - run: npm ci
+      - run: npm test
+      - name: Publish through npm trusted publishing
+        env:
+          NPM_CONFIG_PROVENANCE: true
+        run: |
+          NPM_VERSION="$(npm --version)" node -e 'const current = process.env.NPM_VERSION.split(".").map(Number); const minimum = [11, 5, 1]; const difference = current.findIndex((part, index) => part !== minimum[index]); if (difference >= 0 && current[difference] < minimum[difference]) throw new Error("npm 11.5.1 or newer is required for trusted publishing");'
+          packed="$(npm pack --json --silent --pack-destination "$RUNNER_TEMP")"
+          filename="$(jq -r '.[0].filename' <<< "$packed")"
+          integrity="$(jq -r '.[0].integrity' <<< "$packed")"
+          package="$(node -p 'require("./package.json").name')"
+          version="$(node -p 'require("./package.json").version')"
+          if remote="$(npm view "${package}@${version}" dist.integrity --json 2>"$RUNNER_TEMP/npm-view.err")"; then
+            test "$(jq -r . <<< "$remote")" = "$integrity" || {
+              echo "${package}@${version} already exists with different bytes" >&2
+              exit 1
+            }
+            echo "${package}@${version} already exists with matching integrity; safe retry complete"
+          else
+            grep -q E404 "$RUNNER_TEMP/npm-view.err" || {
+              cat "$RUNNER_TEMP/npm-view.err" >&2
+              exit 1
+            }
+            npm publish "$RUNNER_TEMP/$filename" --access public
+          fi
+          published="$(npm view "${package}@${version}" dist.integrity --json | jq -r .)"
+          test "$published" = "$integrity" || {
+            echo "published registry integrity does not match the verified tarball" >&2
+            exit 1
+          }

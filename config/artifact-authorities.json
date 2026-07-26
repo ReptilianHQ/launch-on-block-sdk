@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "authorities": [
+    {
+      "id": "launch-on-block-contracts",
+      "keys": []
+    }
+  ]
+}

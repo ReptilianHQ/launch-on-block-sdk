@@ -19,6 +19,10 @@
   "engines": {
     "node": ">=22"
   },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
   "type": "module",
   "sideEffects": false,
   "files": [
@@ -62,14 +66,16 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "check": "npm run check:artifacts && npm run build && npm run test:unit && npm run test:pack",
+    "check": "npm run check:artifacts && npm run test:handoff && npm run build && npm run test:unit && npm run test:pack",
     "check:artifacts": "node scripts/check-artifacts.mjs",
     "build": "npm run clean && tsc -p tsconfig.json",
     "prepack": "npm run build",
     "test": "npm run check",
+    "test:handoff": "node --test scripts/import-artifacts.node-test.mjs",
     "test:unit": "tsc -p tsconfig.test.json && vitest run",
     "test:pack": "node scripts/pack.mjs",
-    "verify:deployment": "npm run build && node scripts/verify-deployment.mjs"
+    "verify:deployment": "npm run build && node scripts/verify-deployment.mjs",
+    "artifacts:import": "node scripts/import-artifacts.mjs"
   },
   "peerDependencies": {
     "viem": ">=2.21.0 <3"
