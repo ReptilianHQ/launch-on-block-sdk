@@ -94,22 +94,23 @@ npm ci
 npm test
 ```
 
-`npm test` verifies the imported artifact hashes, builds the package, runs the unit suite, and packs the
+`npm test` verifies the reviewed artifact hashes, builds the package, runs the unit suite, and packs the
 exact public exports from a clean `dist` directory.
 
 Do not import Foundry artifact JSON or copy ABI fragments into consumer applications. Foundry artifacts
 contain deployment bytecode and compiler metadata that application bundles do not need, while copied
 fragments drift independently from the SDK's compatibility checks.
 
-## Contract artifact boundary
+## Contract interface boundary
 
-The Launch On Block contract repository remains authoritative for Solidity source, deployment scripts,
-and production activation. It exports reviewed ABI and deployment inputs through the handoff documented
-in [`docs/ARTIFACT_HANDOFF.md`](docs/ARTIFACT_HANDOFF.md).
+The private Launch On Block repository remains authoritative for deployment scripts and production
+activation. This repository contains only the reviewed public SDK boundary: ABI subsets, deployment
+metadata, deterministic builders, and verification helpers. It does not contain full contract source,
+deployment tooling, credentials, or private infrastructure.
 
-This repository never reads a sibling contract checkout during build or release. Generated inputs are
-committed, hash-bound to their producer identity, reviewed here, and then published as part of an SDK
-release.
+This repository never reads a sibling contract checkout during build or release. The initial generated
+inputs are committed, hash-pinned, reviewed here, and published as part of the SDK release. Contract
+sources can move here later without changing the `0.4.0` public boundary.
 
 ## License
 

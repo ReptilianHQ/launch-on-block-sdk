@@ -4,10 +4,9 @@ This repository owns the public Launch On Block integration boundary: generated 
 deployment metadata, deterministic transaction builders, receipt verification, compatibility checks,
 and runtime-neutral protocol arithmetic.
 
-The private Launch On Block contract repository is the source and deployment authority. It must hand
-artifacts into this repository through a versioned, hash-bound manifest. This repository must never
-read a sibling checkout, private Git branch, Foundry output directory, RPC secret, wallet key, or
-application environment at build time.
+The private Launch On Block contract repository remains the deployment authority. This repository owns
+the reviewed public integration boundary and must never read a sibling checkout, private Git branch,
+Foundry output directory, RPC secret, wallet key, or application environment at build or release time.
 
 Keep the SDK runtime-neutral:
 
@@ -16,7 +15,7 @@ Keep the SDK runtime-neutral:
 - expose narrow subpath exports and stable machine-readable error codes;
 - pin every published deployment to its chain ID, release identity, start block, ABI revision, and
   compatibility evidence;
-- treat generated ABI and deployment files as immutable producer inputs, verified by
+- treat the initial generated ABI and deployment files as immutable reviewed inputs, verified by
   `npm run check:artifacts`;
 - run `npm test` before shipping.
 

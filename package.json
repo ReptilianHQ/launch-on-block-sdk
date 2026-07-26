@@ -2,11 +2,6 @@
   "name": "@reptilianhq/launch-on-block-sdk",
   "version": "0.4.0",
   "description": "Public TypeScript SDK, contract interfaces, ABIs, and deployment metadata for integrating with the Launch On Block protocol.",
-  "launchpadRelease": {
-    "network": "mainnet",
-    "releaseId": "gen-12",
-    "manifest": "deployments/robinhood-mainnet-gen-12.json"
-  },
   "license": "GPL-3.0-only",
   "repository": {
     "type": "git",
@@ -66,16 +61,14 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "check": "npm run check:artifacts && npm run test:handoff && npm run build && npm run test:unit && npm run test:pack",
+    "check": "npm run check:artifacts && npm run build && npm run test:unit && npm run test:pack",
     "check:artifacts": "node scripts/check-artifacts.mjs",
     "build": "npm run clean && tsc -p tsconfig.json",
     "prepack": "npm run build",
     "test": "npm run check",
-    "test:handoff": "node --test scripts/import-artifacts.node-test.mjs",
     "test:unit": "tsc -p tsconfig.test.json && vitest run",
     "test:pack": "node scripts/pack.mjs",
-    "verify:deployment": "npm run build && node scripts/verify-deployment.mjs",
-    "artifacts:import": "node scripts/import-artifacts.mjs"
+    "verify:deployment": "npm run build && node scripts/verify-deployment.mjs"
   },
   "peerDependencies": {
     "viem": ">=2.21.0 <3"
