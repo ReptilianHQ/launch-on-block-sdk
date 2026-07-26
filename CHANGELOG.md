@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.1
+
+- Remove transitional cross-repository handoff metadata from the published package boundary.
+- Pin all GitHub Actions used by CI and release-candidate workflows.
+
 ## 0.4.0
 
 - Establish the public Launch On Block SDK in its dedicated repository.

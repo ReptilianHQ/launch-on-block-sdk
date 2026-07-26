@@ -3,19 +3,14 @@
 SDK publication is independent from contract deployment and activation. Publishing reads only reviewed,
 committed public inputs—never an upstream checkout or RPC endpoint.
 
-## One-time npm bootstrap
+## Trusted publisher setup
 
-The npm package does not exist yet, and npm requires an existing package before a trusted publisher can
-be configured. A maintainer must:
+The initial package exists. A maintainer must:
 
-1. make `ReptilianHQ/launch-on-block-sdk` public so npm provenance can bind to public source;
-2. confirm the public npm scope `@reptilianhq` is controlled by ReptilianHQ;
-3. publish `@reptilianhq/launch-on-block-sdk@0.4.0` once from this exact clean tag using an interactive,
-   2FA-protected maintainer session and `npm publish --access public`; this bootstrap publication is the
-   one release that cannot carry CI provenance because npm cannot trust a publisher before the package exists;
-4. configure the package's npm trusted publisher for GitHub organization `ReptilianHQ`, repository
+1. configure the package's npm trusted publisher for GitHub organization `ReptilianHQ`, repository
    `launch-on-block-sdk`, workflow `publish.yml`, environment `npm`, and allow `npm publish`;
-5. disallow token-based publication after the trusted publisher is proven.
+2. prove the trusted publisher with the next release;
+3. disallow token-based publication after the trusted publisher is proven.
 
 No npm token belongs in GitHub Actions. The repository has no npm credentials by design.
 
