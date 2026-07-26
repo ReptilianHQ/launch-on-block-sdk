@@ -63,8 +63,47 @@ jobs:
             }
             npm publish "$RUNNER_TEMP/$filename" --access public
           fi
-          published="$(npm view "${package}@${version}" dist.integrity --json | jq -r .)"
-          test "$published" = "$integrity" || {
-            echo "published registry integrity does not match the verified tarball" >&2
-            exit 1
-          }
+
+  verify:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - name: Verify published package integrity
+        run: |
+          packed="$(npm pack --json --silent --pack-destination "$RUNNER_TEMP")"
+          expected="$(jq -r '.[0].integrity' <<< "$packed")"
+          package="$(node -p 'require("./package.json").name')"
+          version="$(node -p 'require("./package.json").version')"
+
+          for attempt in {1..12}; do
+            if remote="$(npm view "${package}@${version}" dist.integrity --json 2>"$RUNNER_TEMP/npm-view.err")"; then
+              published="$(jq -r . <<< "$remote")"
+              test "$published" = "$expected" || {
+                echo "published registry integrity does not match the verified tarball" >&2
+                exit 1
+              }
+              echo "verified ${package}@${version} after ${attempt} attempt(s)"
+              exit 0
+            fi
+
+            grep -q E404 "$RUNNER_TEMP/npm-view.err" || {
+              cat "$RUNNER_TEMP/npm-view.err" >&2
+              exit 1
+            }
+            if [ "$attempt" -eq 12 ]; then
+              cat "$RUNNER_TEMP/npm-view.err" >&2
+              echo "published package was not visible after 12 attempts" >&2
+              exit 1
+            fi
+            sleep 5
+          done

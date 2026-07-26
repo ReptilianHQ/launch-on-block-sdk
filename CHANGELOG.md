@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Isolate registry integrity verification in a retryable post-publish job and tolerate npm propagation delay.
+
 ## 0.4.2
 
 - Verify tokenless npm trusted publishing through the protected GitHub Actions release workflow.
