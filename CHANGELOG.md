@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.2
+
+- Verify tokenless npm trusted publishing through the protected GitHub Actions release workflow.
+- Publish npm provenance bound to the public repository, workflow, and release commit.
+
 ## 0.4.1
 
 - Remove transitional cross-repository handoff metadata from the published package boundary.
