@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/ReptilianHQ/launch-on-block-sdk/security/advisories/new
+    about: Report transaction, deployment, receipt, or package-integrity vulnerabilities privately.

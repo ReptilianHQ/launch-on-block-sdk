@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0
+
+- Publish only the reviewed deployment projection while retaining immutable provenance inputs.
+- Make packaged source maps self-contained for consumer debugging and editor navigation.
+- Complete public repository security, contribution, and release-readiness guardrails.
+
 ## 0.6.0
 
 - Relicense the SDK under Apache-2.0 for proprietary and open-source integrations.

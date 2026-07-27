@@ -2,12 +2,80 @@ import type { Address, Hex } from "viem";
 import { deploymentManifest as generatedDeploymentManifest } from "./generated/deployments.js";
 import { SdkError } from "./errors.js";
 
-export const deploymentManifest = deepFreeze(generatedDeploymentManifest);
-
 export const ROBINHOOD_CHAIN_ID = 4663;
 export const ROBINHOOD_CHAIN_TESTNET_ID = 46630;
 
 export type BlockchainEnvironment = "mainnet" | "testnet" | "local";
+
+export interface PublicDeploymentManifestContracts {
+  readonly generation: string;
+  readonly start_block: number;
+  readonly launchpad: Address;
+  readonly fee_controller: Address;
+  readonly fee_controller_implementation: Address;
+  readonly fee_controller_admin: Address;
+  readonly router: Address;
+  readonly lb_factory: Address;
+  readonly lb_pair_implementation: Address;
+  readonly lb_router: Address;
+  readonly launchpad_type: "immutable";
+  readonly curve_id_1: Address;
+  readonly pool_deployer: Address;
+  readonly escrow_deployer: Address;
+  readonly proxy_upgrade_gate: Address;
+  readonly release_id: string;
+  readonly abi_revision: string;
+  readonly runtime_code_hashes: {
+    readonly launchpad: Hex;
+    readonly fee_controller: Hex;
+    readonly fee_controller_implementation: Hex;
+    readonly router: Hex;
+    readonly lb_factory: Hex;
+    readonly lb_pair_implementation: Hex;
+    readonly lb_router: Hex;
+    readonly fee_controller_admin: Hex;
+    readonly curve_id_1: Hex;
+    readonly pool_deployer: Hex;
+    readonly escrow_deployer: Hex;
+    readonly proxy_upgrade_gate: Hex;
+    readonly escrow_implementation: Hex;
+  };
+  readonly implementations: {
+    readonly launchpad: null;
+    readonly fee_controller: { readonly address: Address; readonly runtime_code_hash: Hex };
+  };
+  readonly escrow_implementation: Address;
+}
+
+export interface PublicDeploymentManifestNetwork {
+  readonly name: string;
+  readonly id: string;
+  readonly blockchain_env: BlockchainEnvironment;
+  readonly chain_id: number;
+  readonly rpc_url: string;
+  readonly explorer_url: string | null;
+  readonly native_currency: { readonly name: string; readonly symbol: string; readonly decimals: number };
+  readonly addresses: { readonly w_native: Address | null; readonly usdg: Address | null };
+  readonly contracts: PublicDeploymentManifestContracts | null;
+}
+
+export interface PublicDeploymentManifest {
+  readonly schema_version: 1;
+  readonly active_network: "mainnet";
+  readonly robinhood: {
+    readonly mainnet: PublicDeploymentManifestNetwork;
+    readonly testnet: PublicDeploymentManifestNetwork;
+  };
+}
+
+export const deploymentManifest: PublicDeploymentManifest = deepFreeze({
+  schema_version: 1,
+  active_network: "mainnet",
+  robinhood: {
+    mainnet: toPublicManifestNetwork(generatedDeploymentManifest.robinhood.mainnet),
+    testnet: toPublicManifestNetwork(generatedDeploymentManifest.robinhood.testnet),
+  },
+});
 
 export interface ContractIdentity {
   readonly address: Address;
@@ -134,6 +202,46 @@ const deployments: readonly Deployment[] = deepFreeze(Object.values(deploymentMa
     implementations: normalizeImplementations(network.contracts.implementations),
   },
 })));
+
+type GeneratedNetwork = (typeof generatedDeploymentManifest.robinhood)[keyof typeof generatedDeploymentManifest.robinhood];
+
+function toPublicManifestNetwork(network: GeneratedNetwork): PublicDeploymentManifestNetwork {
+  return {
+    name: network.name,
+    id: network.id,
+    blockchain_env: network.blockchain_env,
+    chain_id: network.chain_id,
+    rpc_url: network.rpc_url,
+    explorer_url: network.explorer_url,
+    native_currency: network.native_currency,
+    addresses: {
+      w_native: network.addresses.w_native as Address | null,
+      usdg: network.addresses.usdg as Address | null,
+    },
+    contracts: network.contracts === null ? null : {
+      generation: network.contracts.generation,
+      start_block: network.contracts.start_block,
+      launchpad: network.contracts.launchpad as Address,
+      fee_controller: network.contracts.fee_controller as Address,
+      fee_controller_implementation: network.contracts.fee_controller_implementation as Address,
+      fee_controller_admin: network.contracts.fee_controller_admin as Address,
+      router: network.contracts.router as Address,
+      lb_factory: network.contracts.lb_factory as Address,
+      lb_pair_implementation: network.contracts.lb_pair_implementation as Address,
+      lb_router: network.contracts.lb_router as Address,
+      launchpad_type: network.contracts.launchpad_type,
+      curve_id_1: network.contracts.curve_id_1 as Address,
+      pool_deployer: network.contracts.pool_deployer as Address,
+      escrow_deployer: network.contracts.escrow_deployer as Address,
+      proxy_upgrade_gate: network.contracts.proxy_upgrade_gate as Address,
+      release_id: network.contracts.release_id,
+      abi_revision: network.contracts.abi_revision,
+      runtime_code_hashes: network.contracts.runtime_code_hashes as PublicDeploymentManifestContracts["runtime_code_hashes"],
+      implementations: network.contracts.implementations as PublicDeploymentManifestContracts["implementations"],
+      escrow_implementation: network.contracts.escrow_implementation as Address,
+    },
+  };
+}
 
 function deepFreeze<T>(value: T): T {
   if (value !== null && typeof value === "object" && !Object.isFrozen(value)) {

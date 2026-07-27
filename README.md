@@ -1,5 +1,9 @@
 # Launch On Block SDK
 
+[![CI](https://github.com/ReptilianHQ/launch-on-block-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/ReptilianHQ/launch-on-block-sdk/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/%40reptilianhq%2Flaunch-on-block-sdk)](https://www.npmjs.com/package/@reptilianhq/launch-on-block-sdk)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+
 Public TypeScript SDK, contract interfaces, ABIs, and deployment metadata for integrating with the
 Launch On Block protocol on Robinhood Chain.
 
@@ -29,6 +33,10 @@ Deployment verification also needs narrow interfaces for the launch-escrow deplo
 proxy upgrade gate. Those interfaces are committed in the generated artifact and bundled with the SDK
 because `assertCompatibleDeployment()` uses them internally, but they are not public package exports.
 Consumers should call the compatibility helper instead of rebuilding governance and proxy checks.
+
+The immutable generated deployment input preserves reviewed provenance. The package exports only a
+typed public projection; operational controls, release authorities, deployer identity, and private
+chain evidence are excluded from declarations and the npm runtime artifact.
 
 The raw launch-escrow ABI remains internal. Consumers that need protocol reconciliation can use
 `readLaunchEscrowState()` from the `./escrows` export. It reads one numbered safe block, verifies the
@@ -80,7 +88,7 @@ npm install @reptilianhq/launch-on-block-sdk viem
 Releases use npm trusted publishing with provenance from the public GitHub repository and protected
 release environment. See [`docs/RELEASING.md`](docs/RELEASING.md).
 
-Version `0.6.0` makes the public integration boundary available under Apache-2.0.
+Version `0.7.0` publishes the hardened public-repository and package boundary under Apache-2.0.
 
 ## Usage
 
@@ -170,6 +178,9 @@ committed indexing artifact from the built SDK catalog; normal checks fail on an
 Do not import Foundry artifact JSON or copy ABI fragments into consumer applications. Foundry artifacts
 contain deployment bytecode and compiler metadata that application bundles do not need, while copied
 fragments drift independently from the SDK's compatibility checks.
+
+Contributions are welcome through focused issues and pull requests. See [`CONTRIBUTING.md`](CONTRIBUTING.md)
+for the public boundary, verification commands, and security-reporting expectations.
 
 ## Contract interface boundary
 

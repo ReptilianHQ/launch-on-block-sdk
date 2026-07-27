@@ -1,0 +1,41 @@
+name: Bug report
+description: Report incorrect SDK behavior, metadata, verification, or documentation.
+title: "bug: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include secrets, private contract source, wallet material, or keyed RPC URLs.
+  - type: input
+    id: version
+    attributes:
+      label: SDK version
+      placeholder: 0.7.0
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - ABIs or deployments
+        - Transactions or receipts
+        - Compatibility verification
+        - Escrow reconciliation
+        - Indexing assets or examples
+        - Documentation or packaging
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Observed and expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Use public addresses and redact credentials.
+    validations:
+      required: true

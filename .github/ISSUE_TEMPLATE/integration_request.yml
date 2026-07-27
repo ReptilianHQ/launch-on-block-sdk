@@ -1,0 +1,30 @@
+name: Integration request
+description: Propose a public ABI, deployment, indexing, or helper addition.
+title: "integration: "
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: boundary
+    attributes:
+      label: Requested boundary
+      options:
+        - Contract read or ABI
+        - Transaction builder or verifier
+        - Receipt evidence
+        - Deployment compatibility
+        - Indexing event or metadata
+        - Runtime-neutral arithmetic
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Integration use case
+      description: Explain the consumer behavior this enables without application-specific policy.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Compatibility or provenance evidence
+      description: Link public evidence only; do not paste private source or deployment material.
