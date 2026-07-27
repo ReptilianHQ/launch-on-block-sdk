@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.7.0
+
+- Remove operational deployment fields from public types and runtime manifests.
+- Make packaged source maps self-contained for consumer debugging and editor navigation.
+- Complete public repository security, contribution, and release-readiness guardrails.
+
+This intentionally breaking pre-1.0 release replaces exact generated manifest types with stable public
+interfaces. Consumers must stop reading `writes_enabled`, `release_authorities`, `deployer_address`,
+`max_managed_native`, and `chain_data` from `deploymentManifest`.
+
 ## 0.6.0
 
 - Relicense the SDK under Apache-2.0 for proprietary and open-source integrations.

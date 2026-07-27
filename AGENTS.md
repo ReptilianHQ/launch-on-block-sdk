@@ -17,6 +17,8 @@ Keep the SDK runtime-neutral:
   compatibility evidence;
 - treat the initial generated ABI and deployment files as immutable reviewed inputs, verified by
   `npm run check:artifacts`;
+- expose deployment metadata through the reviewed public projection only; operational controls and
+  release-authority fields must not enter declarations or the npm runtime artifact;
 - run `npm test` before shipping.
 
 Support consumers on Node.js 22 or newer. Use Node.js 24 and npm with the committed lockfile for

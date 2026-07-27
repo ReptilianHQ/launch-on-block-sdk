@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const manifest = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
@@ -82,7 +82,11 @@ try {
     throw new Error(`packed SDK is missing indexing artifacts: ${missingIndexingFiles.join(", ")}`);
   }
 
-  const internalVerificationFiles = ["dist/generated/abis.js", "dist/generated/abis.d.ts"];
+  const internalVerificationFiles = [
+    "dist/generated/abis.js",
+    "dist/generated/abis.d.ts",
+    "dist/generated/deployments.js",
+  ];
   const missingInternalVerificationFiles = internalVerificationFiles.filter((path) => !files.has(path));
   if (missingInternalVerificationFiles.length > 0) {
     throw new Error(
@@ -92,6 +96,48 @@ try {
   const generatedExports = Object.keys(manifest.exports).filter((path) => path.startsWith("./generated"));
   if (generatedExports.length > 0) {
     throw new Error(`generated verification artifacts must not be public exports: ${generatedExports.join(", ")}`);
+  }
+
+  const forbiddenGeneratedDeploymentFiles = [
+    "dist/generated/deployments.js.map",
+    "dist/generated/deployments.d.ts",
+    "dist/generated/deployments.d.ts.map",
+  ].filter((path) => files.has(path));
+  if (forbiddenGeneratedDeploymentFiles.length > 0) {
+    throw new Error(`packed SDK contains unsanitized deployment artifacts: ${forbiddenGeneratedDeploymentFiles.join(", ")}`);
+  }
+
+  const publicDeploymentContents = [
+    readFileSync(resolve(root, "dist/deployments.d.ts"), "utf8"),
+    readFileSync(resolve(root, "dist/generated/deployments.js"), "utf8"),
+  ].join("\n");
+  const forbiddenDeploymentTerms = [
+    "writes_enabled",
+    "release_authorities",
+    "deployer_address",
+    "max_managed_native",
+    "chain_data",
+  ];
+  const leakedDeploymentTerms = forbiddenDeploymentTerms.filter((term) => publicDeploymentContents.includes(term));
+  if (leakedDeploymentTerms.length > 0) {
+    throw new Error(`packed SDK leaks internal deployment fields: ${leakedDeploymentTerms.join(", ")}`);
+  }
+
+  const extracted = spawnSync("tar", ["-xzf", resolve(packDir, result.filename), "-C", packDir], {
+    encoding: "utf8",
+  });
+  if (extracted.status !== 0) throw new Error(`packed SDK extraction failed:\n${extracted.stderr || extracted.stdout}`);
+  const packagedDeployments = await import(
+    `${pathToFileURL(resolve(packDir, "package/dist/deployments.js")).href}?integrity=${result.integrity}`
+  );
+  const packagedMainnet = packagedDeployments.getDeployment(4663);
+  const packagedManifest = JSON.stringify(packagedDeployments.deploymentManifest);
+  if (packagedMainnet.contracts === null || packagedMainnet.contracts.launchpad.length !== 42) {
+    throw new Error("packed deployment module did not return the reviewed mainnet deployment");
+  }
+  const leakedPackagedTerms = forbiddenDeploymentTerms.filter((term) => packagedManifest.includes(term));
+  if (leakedPackagedTerms.length > 0) {
+    throw new Error(`executed packed SDK leaks internal deployment fields: ${leakedPackagedTerms.join(", ")}`);
   }
 
   console.log(

@@ -3,16 +3,14 @@
 SDK publication is independent from contract deployment and activation. Publishing reads only reviewed,
 committed public inputs—never an upstream checkout or RPC endpoint.
 
-## Trusted publisher setup
+## Trusted publishing boundary
 
-The initial package exists. A maintainer must:
+The npm trusted publisher is active for GitHub organization `ReptilianHQ`, repository
+`launch-on-block-sdk`, workflow `publish.yml`, and environment `npm`. Releases `0.4.2` and later prove
+tokenless publication with npm provenance. No npm token belongs in GitHub Actions or repository secrets.
 
-1. configure the package's npm trusted publisher for GitHub organization `ReptilianHQ`, repository
-   `launch-on-block-sdk`, workflow `publish.yml`, environment `npm`, and allow `npm publish`;
-2. prove the trusted publisher with the next release;
-3. disallow token-based publication after the trusted publisher is proven.
-
-No npm token belongs in GitHub Actions. The repository has no npm credentials by design.
+The protected `npm` environment requires human approval. The publishing workflow additionally proves
+that the release tag, package version, release commit, public repository, and prerelease state agree.
 
 ## Normal release
 
@@ -23,5 +21,6 @@ No npm token belongs in GitHub Actions. The repository has no npm credentials by
 4. `.github/workflows/publish.yml` verifies the tag and release identity, rebuilds and tests the package,
    then publishes through npm OIDC with provenance.
 
-The `npm` GitHub environment is the human approval boundary for publication. Protect it with required
-reviewers before the first automated release.
+5. Wait for the verify job to reproduce the tarball and match its integrity to the npm registry.
+
+The `npm` GitHub environment remains the human approval boundary for every publication.

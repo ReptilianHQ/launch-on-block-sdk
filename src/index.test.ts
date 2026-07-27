@@ -99,6 +99,30 @@ describe("deployment manifest", () => {
     }).toThrow(TypeError);
     expect(getDeployment(ROBINHOOD_CHAIN_TESTNET_ID).contracts.router).not.toBe(token);
   });
+
+  it("publishes only the reviewed deployment integration boundary", () => {
+    const serialized = JSON.stringify(deploymentManifest);
+    for (const internalField of [
+      "writes_enabled",
+      "release_authorities",
+      "deployer_address",
+      "max_managed_native",
+      "chain_data",
+    ]) {
+      expect(serialized).not.toContain(internalField);
+    }
+    expect(Object.keys(deploymentManifest.robinhood.mainnet)).toEqual([
+      "name",
+      "id",
+      "blockchain_env",
+      "chain_id",
+      "rpc_url",
+      "explorer_url",
+      "native_currency",
+      "addresses",
+      "contracts",
+    ]);
+  });
 });
 
 describe("executable deployment compatibility", () => {
