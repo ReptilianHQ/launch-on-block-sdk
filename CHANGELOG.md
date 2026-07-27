@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0
+
+- Relicense the SDK under Apache-2.0 for proprietary and open-source integrations.
+- Preserve the explicit patent grant and attribution terms in the published package.
+- Keep releases through 0.5.0 available under their original GPL-3.0-only terms.
+
 ## 0.5.0
 
 - Clarify public ABI boundaries while retaining internal deployment compatibility checks.

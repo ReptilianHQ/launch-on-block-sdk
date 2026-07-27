@@ -80,7 +80,7 @@ npm install @reptilianhq/launch-on-block-sdk viem
 Releases use npm trusted publishing with provenance from the public GitHub repository and protected
 release environment. See [`docs/RELEASING.md`](docs/RELEASING.md).
 
-Version `0.4.0` establishes the initial public package API in this dedicated repository.
+Version `0.6.0` makes the public integration boundary available under Apache-2.0.
 
 ## Usage
 
@@ -180,8 +180,10 @@ deployment tooling, credentials, or private infrastructure.
 
 This repository never reads a sibling contract checkout during build or release. The initial generated
 inputs are committed, hash-pinned, reviewed here, and published as part of the SDK release. Contract
-sources can move here later without changing the `0.4.0` public boundary.
+sources can move here later without changing the established public boundary.
 
 ## License
 
-GPL-3.0-only. See [`LICENSE`](LICENSE).
+Apache-2.0. Proprietary and open-source applications may use the SDK without relicensing their own
+code. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). Releases through `0.5.0` remain available under
+their original GPL-3.0-only terms; Apache-2.0 applies beginning with `0.6.0`.
