@@ -180,18 +180,26 @@ models separately so raw protocol amounts are never silently presented as priced
 function envioHandlers() {
   const handlers = launchOnBlockEventCatalog.contracts.flatMap((contract) => contract.events.map((event) => {
     const entity = entityName(contract, event);
-    const registrations = contract.name === "Launchpad" && event.name === "LaunchCreated"
-      ? "\n    context.chain.LaunchToken.add(event.params.token);"
-      : contract.name === "Launchpad" && event.name === "Graduated"
-        ? "\n    context.chain.GraduationPool.add(event.params.pool);"
-        : "";
     return `indexer.onEvent({ contract: "${contract.name}", event: "${event.name}" }, async ({ event, context }) => {
   context.${entity}.set({
     ...metadata(event),
 ${event.parameters.map((parameter) => `    ${parameter.name}: ${envioValue(parameter)},`).join("\n")}
-  });${registrations}
+  });
 });`;
   })).join("\n\n");
+  const registrations = `indexer.contractRegister(
+  { contract: "Launchpad", event: "LaunchCreated" },
+  async ({ event, context }) => {
+    context.chain.LaunchToken.add(event.params.token);
+  },
+);
+
+indexer.contractRegister(
+  { contract: "Launchpad", event: "Graduated" },
+  async ({ event, context }) => {
+    context.chain.GraduationPool.add(event.params.pool);
+  },
+);`;
   return `// Generated runnable starter. Copy the example before adding application-specific entities.
 import { indexer } from "envio";
 
@@ -216,6 +224,8 @@ function metadata(event: {
 }
 
 ${handlers}
+
+${registrations}
 `;
 }
 

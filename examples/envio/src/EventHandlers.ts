@@ -31,7 +31,6 @@ indexer.onEvent({ contract: "Launchpad", event: "LaunchCreated" }, async ({ even
     payoutWallet: event.params.payoutWallet,
     metadataURI: event.params.metadataURI,
   });
-    context.chain.LaunchToken.add(event.params.token);
 });
 
 indexer.onEvent({ contract: "Launchpad", event: "CurveAvailabilitySet" }, async ({ event, context }) => {
@@ -93,7 +92,6 @@ indexer.onEvent({ contract: "Launchpad", event: "Graduated" }, async ({ event, c
     poolTokens: BigInt(event.params.poolTokens),
     burnedTokens: BigInt(event.params.burnedTokens),
   });
-    context.chain.GraduationPool.add(event.params.pool);
 });
 
 indexer.onEvent({ contract: "Launchpad", event: "Claimed" }, async ({ event, context }) => {
@@ -167,3 +165,17 @@ indexer.onEvent({ contract: "GraduationPool", event: "ProtocolFeesCollected" }, 
     amount1: BigInt(event.params.amount1),
   });
 });
+
+indexer.contractRegister(
+  { contract: "Launchpad", event: "LaunchCreated" },
+  async ({ event, context }) => {
+    context.chain.LaunchToken.add(event.params.token);
+  },
+);
+
+indexer.contractRegister(
+  { contract: "Launchpad", event: "Graduated" },
+  async ({ event, context }) => {
+    context.chain.GraduationPool.add(event.params.pool);
+  },
+);
