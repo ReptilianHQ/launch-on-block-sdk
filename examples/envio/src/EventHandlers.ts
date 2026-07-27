@@ -15,10 +15,15 @@ function metadata(event: {
     blockNumber: BigInt(event.block.number),
     blockHash: event.block.hash,
     blockTimestamp: BigInt(event.block.timestamp),
-    transactionHash: event.transaction.hash ?? "",
-    transactionIndex: BigInt(event.transaction.transactionIndex ?? 0),
+    transactionHash: required(event.transaction.hash, "transaction.hash"),
+    transactionIndex: BigInt(required(event.transaction.transactionIndex, "transaction.transactionIndex")),
     logIndex: BigInt(event.logIndex),
   };
+}
+
+function required<T>(value: T | undefined, field: string): T {
+  if (value === undefined) throw new Error(`Envio did not provide required provenance field ${field}`);
+  return value;
 }
 
 indexer.onEvent({ contract: "Launchpad", event: "LaunchCreated" }, async ({ event, context }) => {

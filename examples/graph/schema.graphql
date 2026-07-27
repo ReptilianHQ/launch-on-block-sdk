@@ -1,6 +1,6 @@
 # Generated decoded-event entities. Build domain read models from these immutable records.
 type LaunchpadLaunchCreatedEvent @entity(immutable: true) {
-  id: ID!
+  id: Bytes!
   network: String!
   emitter: Bytes!
   blockNumber: BigInt!
@@ -18,7 +18,7 @@ type LaunchpadLaunchCreatedEvent @entity(immutable: true) {
 }
 
 type LaunchpadCurveAvailabilitySetEvent @entity(immutable: true) {
-  id: ID!
+  id: Bytes!
   network: String!
   emitter: Bytes!
   blockNumber: BigInt!
@@ -32,7 +32,7 @@ type LaunchpadCurveAvailabilitySetEvent @entity(immutable: true) {
 }
 
 type LaunchpadCurveRegisteredEvent @entity(immutable: true) {
-  id: ID!
+  id: Bytes!
   network: String!
   emitter: Bytes!
   blockNumber: BigInt!
@@ -47,7 +47,7 @@ type LaunchpadCurveRegisteredEvent @entity(immutable: true) {
 }
 
 type LaunchpadCurveSelectedEvent @entity(immutable: true) {
-  id: ID!
+  id: Bytes!
   network: String!
   emitter: Bytes!
   blockNumber: BigInt!
@@ -63,7 +63,7 @@ type LaunchpadCurveSelectedEvent @entity(immutable: true) {
 }
 
 type LaunchpadBuyEvent @entity(immutable: true) {
-  id: ID!
+  id: Bytes!
   network: String!
   emitter: Bytes!
   blockNumber: BigInt!
@@ -79,7 +79,7 @@ type LaunchpadBuyEvent @entity(immutable: true) {
 }
 
 type LaunchpadSellEvent @entity(immutable: true) {
-  id: ID!
+  id: Bytes!
   network: String!
   emitter: Bytes!
   blockNumber: BigInt!
@@ -95,7 +95,7 @@ type LaunchpadSellEvent @entity(immutable: true) {
 }
 
 type LaunchpadGraduatedEvent @entity(immutable: true) {
-  id: ID!
+  id: Bytes!
   network: String!
   emitter: Bytes!
   blockNumber: BigInt!
@@ -115,7 +115,7 @@ type LaunchpadGraduatedEvent @entity(immutable: true) {
 }
 
 type LaunchpadClaimedEvent @entity(immutable: true) {
-  id: ID!
+  id: Bytes!
   network: String!
   emitter: Bytes!
   blockNumber: BigInt!
@@ -129,7 +129,7 @@ type LaunchpadClaimedEvent @entity(immutable: true) {
 }
 
 type RouterSwapEvent @entity(immutable: true) {
-  id: ID!
+  id: Bytes!
   network: String!
   emitter: Bytes!
   blockNumber: BigInt!
@@ -146,7 +146,7 @@ type RouterSwapEvent @entity(immutable: true) {
 }
 
 type FeeControllerFeesCollectedEvent @entity(immutable: true) {
-  id: ID!
+  id: Bytes!
   network: String!
   emitter: Bytes!
   blockNumber: BigInt!
@@ -166,7 +166,7 @@ type FeeControllerFeesCollectedEvent @entity(immutable: true) {
 }
 
 type LaunchTokenApprovalEvent @entity(immutable: true) {
-  id: ID!
+  id: Bytes!
   network: String!
   emitter: Bytes!
   blockNumber: BigInt!
@@ -181,7 +181,7 @@ type LaunchTokenApprovalEvent @entity(immutable: true) {
 }
 
 type LaunchTokenTransferEvent @entity(immutable: true) {
-  id: ID!
+  id: Bytes!
   network: String!
   emitter: Bytes!
   blockNumber: BigInt!
@@ -196,7 +196,7 @@ type LaunchTokenTransferEvent @entity(immutable: true) {
 }
 
 type GraduationPoolSwapEvent @entity(immutable: true) {
-  id: ID!
+  id: Bytes!
   network: String!
   emitter: Bytes!
   blockNumber: BigInt!
@@ -214,7 +214,7 @@ type GraduationPoolSwapEvent @entity(immutable: true) {
 }
 
 type GraduationPoolProtocolFeesCollectedEvent @entity(immutable: true) {
-  id: ID!
+  id: Bytes!
   network: String!
   emitter: Bytes!
   blockNumber: BigInt!

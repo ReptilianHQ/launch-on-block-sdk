@@ -1,5 +1,5 @@
 // Generated runnable starter. Copy the example before adding domain-specific entities.
-import { dataSource } from "@graphprotocol/graph-ts";
+import { BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { Swap } from "../generated/Router/Router";
 import { RouterSwapEvent } from "../generated/schema";
 

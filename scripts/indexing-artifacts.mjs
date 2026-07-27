@@ -28,6 +28,7 @@ const artifacts = new Map([
   ["examples/envio/package.json", json(envioPackage())],
   ["examples/envio/README.md", envioReadme()],
   ["examples/envio/schema.graphql", envioSchema()],
+  ["examples/envio/tsconfig.json", json(envioTsconfig())],
   ["examples/envio/src/EventHandlers.ts", envioHandlers()],
   ["examples/graph/networks.json", json(graphNetworks(manifests))],
   ["examples/graph/package.json", json(graphPackage())],
@@ -117,9 +118,14 @@ function envioConfig(networks) {
   ].join("\n")).join("\n");
   const chains = networks.map((network) => {
     const fixed = network.sources.filter((source) => source.kind === "fixed");
+    const rpcEnvironment = network.chainId === 4663
+      ? "ENVIO_ROBINHOOD_MAINNET_RPC_URL"
+      : "ENVIO_ROBINHOOD_TESTNET_RPC_URL";
     return [
       `  - id: ${network.chainId}`,
       `    start_block: ${network.startBlock}`,
+      "    rpc:",
+      `      - url: \${${rpcEnvironment}}`,
       "    contracts:",
       ...fixed.flatMap((source) => [
         `      - name: ${source.contract}`,
@@ -155,9 +161,29 @@ function envioPackage() {
     type: "module",
     scripts: {
       codegen: "envio codegen",
+      typecheck: "tsc --noEmit",
+      check: "npm run codegen && npm run typecheck",
       start: "envio dev",
     },
     dependencies: { envio: "3.2.1" },
+    devDependencies: { typescript: "5.7.3" },
+  };
+}
+
+function envioTsconfig() {
+  return {
+    compilerOptions: {
+      lib: ["es2022"],
+      module: "ESNext",
+      moduleResolution: "bundler",
+      noEmit: true,
+      noUncheckedIndexedAccess: true,
+      skipLibCheck: true,
+      strict: true,
+      target: "es2022",
+      verbatimModuleSyntax: true,
+    },
+    include: ["envio-env.d.ts", "src/**/*.ts"],
   };
 }
 
@@ -169,8 +195,9 @@ tokens and graduation pools. It is generated from the SDK catalog.
 
 1. Copy this directory together with the repository's \`indexing/\` directory, preserving their relative
    paths.
-2. Add your Robinhood RPC configuration and confirmation/reorg policy to \`config.yaml\`.
-3. Run \`npm install && npm run codegen\`, then \`npm start\`.
+2. Set \`ENVIO_ROBINHOOD_MAINNET_RPC_URL\` and \`ENVIO_ROBINHOOD_TESTNET_RPC_URL\` to archive-capable
+   endpoints, then add your confirmation/reorg policy to \`config.yaml\`.
+3. Run \`npm install && npm run check\`, then \`npm start\`.
 
 The schema is deliberately event-shaped. Build pricing, liquidity, valuation, and application read
 models separately so raw protocol amounts are never silently presented as priced values.
@@ -217,10 +244,15 @@ function metadata(event: {
     blockNumber: BigInt(event.block.number),
     blockHash: event.block.hash,
     blockTimestamp: BigInt(event.block.timestamp),
-    transactionHash: event.transaction.hash ?? "",
-    transactionIndex: BigInt(event.transaction.transactionIndex ?? 0),
+    transactionHash: required(event.transaction.hash, "transaction.hash"),
+    transactionIndex: BigInt(required(event.transaction.transactionIndex, "transaction.transactionIndex")),
     logIndex: BigInt(event.logIndex),
   };
+}
+
+function required<T>(value: T | undefined, field: string): T {
+  if (value === undefined) throw new Error(\`Envio did not provide required provenance field ${"${field}"}\`);
+  return value;
 }
 
 ${handlers}
@@ -251,6 +283,7 @@ function graphPackage() {
   return {
     private: true,
     scripts: {
+      check: "npm run codegen:mainnet && npm run build:mainnet && npm run codegen:testnet && npm run build:testnet",
       "codegen:mainnet": "graph codegen subgraph.mainnet.yaml",
       "codegen:testnet": "graph codegen subgraph.testnet.yaml",
       "build:mainnet": "graph build subgraph.mainnet.yaml",
@@ -344,7 +377,7 @@ function entitySchema(vendor) {
     const directive = vendor === "graph" ? " @entity(immutable: true)" : "";
     const networkIdentity = vendor === "graph" ? "  network: String!" : "  chainId: BigInt!";
     return `type ${entityName(contract, event)}${directive} {
-  id: ID!
+  id: ${vendor === "graph" ? "Bytes" : "ID"}!
 ${networkIdentity}
   emitter: ${vendor === "graph" ? "Bytes" : "String"}!
   blockNumber: BigInt!
@@ -389,17 +422,23 @@ function graphMapping(contract) {
     return `export function handle${entity}(event: ${event.name}): void {
   const entity = new ${entity}(event.transaction.hash.concatI32(event.logIndex.toI32()));
   setMetadata(entity, event);
-${event.parameters.map((parameter) => `  entity.${parameter.name} = event.params.${parameter.name};`).join("\n")}
+${event.parameters.map((parameter) => `  entity.${parameter.name} = ${graphValue(parameter)};`).join("\n")}
   entity.save();${discovery}
 }`;
   }).join("\n\n");
   return `// Generated runnable starter. Copy the example before adding domain-specific entities.
-import { dataSource } from "@graphprotocol/graph-ts";
+import { BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { ${imports} } from "${generatedPath}";
 ${templateImports}import { ${entities} } from "../generated/schema";
 
 ${handlers.replaceAll("  setMetadata(entity, event);", `  entity.network = dataSource.network();\n  entity.emitter = event.address;\n  entity.blockNumber = event.block.number;\n  entity.blockHash = event.block.hash;\n  entity.blockTimestamp = event.block.timestamp;\n  entity.transactionHash = event.transaction.hash;\n  entity.transactionIndex = event.transaction.index;\n  entity.logIndex = event.logIndex;`)}
 `;
+}
+
+function graphValue(parameter) {
+  const integer = /^(u?int)([0-9]+)$/.exec(parameter.type);
+  if (integer && Number(integer[2]) <= 24) return `BigInt.fromI32(event.params.${parameter.name})`;
+  return `event.params.${parameter.name}`;
 }
 
 function entityName(contract, event) {
@@ -476,6 +515,20 @@ function indexingManifestSchema() {
               },
             },
           },
+          oneOf: [
+            {
+              properties: {
+                sourceKind: { const: "fixed" },
+                discoveredBy: { type: "null" },
+              },
+            },
+            {
+              properties: {
+                sourceKind: { const: "dynamic" },
+                discoveredBy: { type: "object" },
+              },
+            },
+          ],
           additionalProperties: false,
         },
       },
@@ -508,6 +561,24 @@ function indexingManifestSchema() {
                   startBlock: { type: ["integer", "null"], minimum: 0 },
                   discoveredBy: discovery,
                 },
+                oneOf: [
+                  {
+                    properties: {
+                      kind: { const: "fixed" },
+                      address: { type: "string", pattern: "^0x[0-9a-fA-F]{40}$" },
+                      startBlock: { type: "integer", minimum: 0 },
+                      discoveredBy: { type: "null" },
+                    },
+                  },
+                  {
+                    properties: {
+                      kind: { const: "dynamic" },
+                      address: { type: "null" },
+                      startBlock: { type: "null" },
+                      discoveredBy: { type: "object" },
+                    },
+                  },
+                ],
                 additionalProperties: false,
               },
             },

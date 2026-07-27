@@ -1,5 +1,5 @@
 // Generated runnable starter. Copy the example before adding domain-specific entities.
-import { dataSource } from "@graphprotocol/graph-ts";
+import { BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { Approval, Transfer } from "../generated/templates/LaunchToken/LaunchToken";
 import { LaunchTokenApprovalEvent, LaunchTokenTransferEvent } from "../generated/schema";
 

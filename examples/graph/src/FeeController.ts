@@ -1,5 +1,5 @@
 // Generated runnable starter. Copy the example before adding domain-specific entities.
-import { dataSource } from "@graphprotocol/graph-ts";
+import { BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { FeesCollected } from "../generated/FeeController/FeeController";
 import { FeeControllerFeesCollectedEvent } from "../generated/schema";
 

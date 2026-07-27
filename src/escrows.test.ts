@@ -14,12 +14,13 @@ function client(options: {
   escrowToken?: Address;
   bytecode?: `0x${string}` | undefined;
   chainId?: number;
+  safeBlockNumber?: bigint | null;
 } = {}): PublicClient {
   const mappedEscrow = options.mappedEscrow ?? escrow;
   const predictedEscrow = options.predictedEscrow ?? escrow;
   return {
     getChainId: async () => options.chainId ?? ROBINHOOD_CHAIN_TESTNET_ID,
-    getBlock: async () => ({ number: 123n }),
+    getBlock: async () => ({ number: options.safeBlockNumber === undefined ? 123n : options.safeBlockNumber }),
     getBytecode: async () => options.bytecode ?? (mappedEscrow === zeroAddress ? "0x" : "0x6000"),
     readContract: async ({ address, functionName }: { address: Address; functionName: string }) => {
       if (functionName === "escrowOf") return mappedEscrow;
@@ -76,6 +77,11 @@ describe("launch escrow state", () => {
       deployment,
       token,
     )).rejects.toMatchObject({ code: "POINTER_MISMATCH", path: "escrow.token" });
+    await expect(readLaunchEscrowState(
+      client({ escrowLaunchpad: getAddress("0x6666666666666666666666666666666666666666") }),
+      deployment,
+      token,
+    )).rejects.toMatchObject({ code: "POINTER_MISMATCH", path: "escrow.launchpad" });
   });
 
   it("rejects the wrong chain, zero token, and missing escrow code", async () => {
@@ -91,6 +97,20 @@ describe("launch escrow state", () => {
     await expect(readLaunchEscrowState(client({ bytecode: "0x" }), deployment, token)).rejects.toMatchObject({
       code: "CODE_MISSING",
       path: "escrow",
+    });
+    await expect(readLaunchEscrowState(client({ safeBlockNumber: null }), deployment, token)).rejects.toMatchObject({
+      code: "CODE_MISSING",
+      path: "blockNumber",
+    });
+  });
+
+  it("uses an explicit numbered block without requesting the safe head", async () => {
+    const explicitClient = client();
+    explicitClient.getBlock = async () => {
+      throw new Error("safe head should not be requested");
+    };
+    await expect(readLaunchEscrowState(explicitClient, deployment, token, { blockNumber: 456n })).resolves.toMatchObject({
+      blockNumber: 456n,
     });
   });
 });

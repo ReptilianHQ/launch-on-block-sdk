@@ -1,5 +1,5 @@
 // Generated runnable starter. Copy the example before adding domain-specific entities.
-import { dataSource } from "@graphprotocol/graph-ts";
+import { BigInt, dataSource } from "@graphprotocol/graph-ts";
 import { LaunchCreated, CurveAvailabilitySet, CurveRegistered, CurveSelected, Buy, Sell, Graduated, Claimed } from "../generated/Launchpad/Launchpad";
 import { GraduationPool as GraduationPoolTemplate, LaunchToken as LaunchTokenTemplate } from "../generated/templates";
 import { LaunchpadLaunchCreatedEvent, LaunchpadCurveAvailabilitySetEvent, LaunchpadCurveRegisteredEvent, LaunchpadCurveSelectedEvent, LaunchpadBuyEvent, LaunchpadSellEvent, LaunchpadGraduatedEvent, LaunchpadClaimedEvent } from "../generated/schema";
@@ -16,8 +16,8 @@ export function handleLaunchpadLaunchCreatedEvent(event: LaunchCreated): void {
   entity.logIndex = event.logIndex;
   entity.token = event.params.token;
   entity.creator = event.params.creator;
-  entity.creatorBps = event.params.creatorBps;
-  entity.curveFeeBps = event.params.curveFeeBps;
+  entity.creatorBps = BigInt.fromI32(event.params.creatorBps);
+  entity.curveFeeBps = BigInt.fromI32(event.params.curveFeeBps);
   entity.payoutWallet = event.params.payoutWallet;
   entity.metadataURI = event.params.metadataURI;
   entity.save();

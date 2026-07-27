@@ -150,6 +150,28 @@
             }
           }
         },
+        "oneOf": [
+          {
+            "properties": {
+              "sourceKind": {
+                "const": "fixed"
+              },
+              "discoveredBy": {
+                "type": "null"
+              }
+            }
+          },
+          {
+            "properties": {
+              "sourceKind": {
+                "const": "dynamic"
+              },
+              "discoveredBy": {
+                "type": "object"
+              }
+            }
+          }
+        ],
         "additionalProperties": false
       }
     },
@@ -277,6 +299,42 @@
                   "additionalProperties": false
                 }
               },
+              "oneOf": [
+                {
+                  "properties": {
+                    "kind": {
+                      "const": "fixed"
+                    },
+                    "address": {
+                      "type": "string",
+                      "pattern": "^0x[0-9a-fA-F]{40}$"
+                    },
+                    "startBlock": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "discoveredBy": {
+                      "type": "null"
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "kind": {
+                      "const": "dynamic"
+                    },
+                    "address": {
+                      "type": "null"
+                    },
+                    "startBlock": {
+                      "type": "null"
+                    },
+                    "discoveredBy": {
+                      "type": "object"
+                    }
+                  }
+                }
+              ],
               "additionalProperties": false
             }
           }

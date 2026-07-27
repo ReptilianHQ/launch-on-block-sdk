@@ -40,6 +40,8 @@ contracts:
 chains:
   - id: 4663
     start_block: 17957183
+    rpc:
+      - url: ${ENVIO_ROBINHOOD_MAINNET_RPC_URL}
     contracts:
       - name: Launchpad
         start_block: 17957183
@@ -55,6 +57,8 @@ chains:
           - "0xbd885463e6e0f24ee467f173719a7330ade1ca01"
   - id: 46630
     start_block: 92793378
+    rpc:
+      - url: ${ENVIO_ROBINHOOD_TESTNET_RPC_URL}
     contracts:
       - name: Launchpad
         start_block: 92793378

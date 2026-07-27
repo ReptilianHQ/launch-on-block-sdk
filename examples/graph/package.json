@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "check": "npm run codegen:mainnet && npm run build:mainnet && npm run codegen:testnet && npm run build:testnet",
     "codegen:mainnet": "graph codegen subgraph.mainnet.yaml",
     "codegen:testnet": "graph codegen subgraph.testnet.yaml",
     "build:mainnet": "graph build subgraph.mainnet.yaml",
