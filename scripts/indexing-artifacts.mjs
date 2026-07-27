@@ -463,6 +463,16 @@ function indexingManifestSchema() {
     },
     additionalProperties: false,
   };
+  const exactDiscovery = (event, addressParameter) => ({
+    type: "object",
+    required: ["contract", "event", "addressParameter"],
+    properties: {
+      contract: { const: "Launchpad" },
+      event: { const: event },
+      addressParameter: { const: addressParameter },
+    },
+    additionalProperties: false,
+  });
   return {
     $schema: "https://json-schema.org/draft/2020-12/schema",
     $id: "https://github.com/ReptilianHQ/launch-on-block-sdk/indexing/manifest.schema.json",
@@ -518,14 +528,23 @@ function indexingManifestSchema() {
           oneOf: [
             {
               properties: {
+                name: { enum: ["Launchpad", "Router", "FeeController"] },
                 sourceKind: { const: "fixed" },
                 discoveredBy: { type: "null" },
               },
             },
             {
               properties: {
+                name: { const: "LaunchToken" },
                 sourceKind: { const: "dynamic" },
-                discoveredBy: { type: "object" },
+                discoveredBy: exactDiscovery("LaunchCreated", "token"),
+              },
+            },
+            {
+              properties: {
+                name: { const: "GraduationPool" },
+                sourceKind: { const: "dynamic" },
+                discoveredBy: exactDiscovery("Graduated", "pool"),
               },
             },
           ],
@@ -564,6 +583,7 @@ function indexingManifestSchema() {
                 oneOf: [
                   {
                     properties: {
+                      contract: { enum: ["Launchpad", "Router", "FeeController"] },
                       kind: { const: "fixed" },
                       address: { type: "string", pattern: "^0x[0-9a-fA-F]{40}$" },
                       startBlock: { type: "integer", minimum: 0 },
@@ -572,10 +592,20 @@ function indexingManifestSchema() {
                   },
                   {
                     properties: {
+                      contract: { const: "LaunchToken" },
                       kind: { const: "dynamic" },
                       address: { type: "null" },
                       startBlock: { type: "null" },
-                      discoveredBy: { type: "object" },
+                      discoveredBy: exactDiscovery("LaunchCreated", "token"),
+                    },
+                  },
+                  {
+                    properties: {
+                      contract: { const: "GraduationPool" },
+                      kind: { const: "dynamic" },
+                      address: { type: "null" },
+                      startBlock: { type: "null" },
+                      discoveredBy: exactDiscovery("Graduated", "pool"),
                     },
                   },
                 ],

@@ -153,6 +153,13 @@
         "oneOf": [
           {
             "properties": {
+              "name": {
+                "enum": [
+                  "Launchpad",
+                  "Router",
+                  "FeeController"
+                ]
+              },
               "sourceKind": {
                 "const": "fixed"
               },
@@ -163,11 +170,61 @@
           },
           {
             "properties": {
+              "name": {
+                "const": "LaunchToken"
+              },
               "sourceKind": {
                 "const": "dynamic"
               },
               "discoveredBy": {
-                "type": "object"
+                "type": "object",
+                "required": [
+                  "contract",
+                  "event",
+                  "addressParameter"
+                ],
+                "properties": {
+                  "contract": {
+                    "const": "Launchpad"
+                  },
+                  "event": {
+                    "const": "LaunchCreated"
+                  },
+                  "addressParameter": {
+                    "const": "token"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          {
+            "properties": {
+              "name": {
+                "const": "GraduationPool"
+              },
+              "sourceKind": {
+                "const": "dynamic"
+              },
+              "discoveredBy": {
+                "type": "object",
+                "required": [
+                  "contract",
+                  "event",
+                  "addressParameter"
+                ],
+                "properties": {
+                  "contract": {
+                    "const": "Launchpad"
+                  },
+                  "event": {
+                    "const": "Graduated"
+                  },
+                  "addressParameter": {
+                    "const": "pool"
+                  }
+                },
+                "additionalProperties": false
               }
             }
           }
@@ -302,6 +359,13 @@
               "oneOf": [
                 {
                   "properties": {
+                    "contract": {
+                      "enum": [
+                        "Launchpad",
+                        "Router",
+                        "FeeController"
+                      ]
+                    },
                     "kind": {
                       "const": "fixed"
                     },
@@ -320,6 +384,9 @@
                 },
                 {
                   "properties": {
+                    "contract": {
+                      "const": "LaunchToken"
+                    },
                     "kind": {
                       "const": "dynamic"
                     },
@@ -330,7 +397,60 @@
                       "type": "null"
                     },
                     "discoveredBy": {
-                      "type": "object"
+                      "type": "object",
+                      "required": [
+                        "contract",
+                        "event",
+                        "addressParameter"
+                      ],
+                      "properties": {
+                        "contract": {
+                          "const": "Launchpad"
+                        },
+                        "event": {
+                          "const": "LaunchCreated"
+                        },
+                        "addressParameter": {
+                          "const": "token"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "contract": {
+                      "const": "GraduationPool"
+                    },
+                    "kind": {
+                      "const": "dynamic"
+                    },
+                    "address": {
+                      "type": "null"
+                    },
+                    "startBlock": {
+                      "type": "null"
+                    },
+                    "discoveredBy": {
+                      "type": "object",
+                      "required": [
+                        "contract",
+                        "event",
+                        "addressParameter"
+                      ],
+                      "properties": {
+                        "contract": {
+                          "const": "Launchpad"
+                        },
+                        "event": {
+                          "const": "Graduated"
+                        },
+                        "addressParameter": {
+                          "const": "pool"
+                        }
+                      },
+                      "additionalProperties": false
                     }
                   }
                 }
