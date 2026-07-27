@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { isDeepStrictEqual } from "node:util";
 
 const mirroredFields = ["name", "engines", "dependencies", "devDependencies"];
@@ -16,4 +18,16 @@ export function validateExampleLockfile(packageJson, lockfile, label = "example 
       throw new Error(`${label} root ${field} does not match package.json`);
     }
   }
+}
+
+export function validateExamplePackageFiles(root, packagePath, lockPath) {
+  const packageFile = resolve(root, packagePath);
+  const lockFile = resolve(root, lockPath);
+  if (!existsSync(packageFile)) throw new Error(`required example manifest is missing: ${packagePath}`);
+  if (!existsSync(lockFile)) throw new Error(`required example lockfile is missing: ${lockPath}`);
+  validateExampleLockfile(
+    JSON.parse(readFileSync(packageFile, "utf8")),
+    JSON.parse(readFileSync(lockFile, "utf8")),
+    lockPath,
+  );
 }

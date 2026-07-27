@@ -3,7 +3,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { launchOnBlockEventCatalog, listIndexingManifests } from "../dist/indexing.js";
-import { validateExampleLockfile } from "./example-lockfiles.mjs";
+import { validateExamplePackageFiles } from "./example-lockfiles.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const mode = process.argv[2];
@@ -95,15 +95,7 @@ if (mode === "--write") {
 
 function validateExamplePackages() {
   for (const [packagePath, lockPath] of examplePackagePairs) {
-    const packageFile = resolve(root, packagePath);
-    const lockFile = resolve(root, lockPath);
-    if (!existsSync(packageFile)) throw new Error(`required example manifest is missing: ${packagePath}`);
-    if (!existsSync(lockFile)) throw new Error(`required example lockfile is missing: ${lockPath}`);
-    validateExampleLockfile(
-      JSON.parse(readFileSync(packageFile, "utf8")),
-      JSON.parse(readFileSync(lockFile, "utf8")),
-      lockPath,
-    );
+    validateExamplePackageFiles(root, packagePath, lockPath);
   }
 }
 

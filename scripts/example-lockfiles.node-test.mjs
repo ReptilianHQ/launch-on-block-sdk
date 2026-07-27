@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { resolve } from "node:path";
 import test from "node:test";
 
-import { validateExampleLockfile } from "./example-lockfiles.mjs";
+import { validateExampleLockfile, validateExamplePackageFiles } from "./example-lockfiles.mjs";
 
 const manifest = {
   name: "example",
@@ -35,4 +38,17 @@ test("rejects stale dependency metadata", () => {
     () => validateExampleLockfile(manifest, lockfile),
     /root dependencies does not match package\.json/,
   );
+});
+
+test("rejects a missing lockfile on disk", () => {
+  const directory = mkdtempSync(resolve(tmpdir(), "launch-on-block-example-lock-"));
+  try {
+    writeFileSync(resolve(directory, "package.json"), JSON.stringify(manifest));
+    assert.throws(
+      () => validateExamplePackageFiles(directory, "package.json", "package-lock.json"),
+      /required example lockfile is missing/,
+    );
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
 });
