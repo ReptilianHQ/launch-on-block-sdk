@@ -1,6 +1,10 @@
 {
+  "name": "@reptilianhq/launch-on-block-envio-example",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22 <23"
+  },
   "scripts": {
     "codegen": "envio codegen",
     "typecheck": "tsc --noEmit",

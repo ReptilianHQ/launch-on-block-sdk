@@ -1,7 +1,16 @@
 {
   "name": "@reptilianhq/launch-on-block-sdk",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Public TypeScript SDK, contract interfaces, ABIs, and deployment metadata for integrating with the Launch On Block protocol.",
+  "keywords": [
+    "ethereum",
+    "indexing",
+    "robinhood-chain",
+    "sdk",
+    "smart-contracts",
+    "typescript",
+    "web3"
+  ],
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -96,7 +105,7 @@
   },
   "devDependencies": {
     "typescript": "^5.7.3",
-    "viem": "^2.55.2",
+    "viem": "^2.55.10",
     "vitest": "4.1.10"
   }
 }

@@ -6,6 +6,11 @@ import { launchOnBlockEventCatalog, listIndexingManifests } from "../dist/indexi
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const mode = process.argv[2];
+const preservedPaths = [
+  "examples/envio/package-lock.json",
+  "examples/graph/package-lock.json",
+];
+const ignoredGeneratedEntries = new Set(["node_modules", ".envio", "build", "generated", "envio-env.d.ts"]);
 
 if (mode !== "--write" && mode !== "--check") {
   throw new Error("usage: node scripts/indexing-artifacts.mjs --write|--check");
@@ -45,10 +50,14 @@ for (const manifest of manifests) {
 }
 
 if (mode === "--write") {
+  const preserved = new Map(preservedPaths.flatMap((relativePath) => {
+    const path = resolve(root, relativePath);
+    return existsSync(path) ? [[relativePath, readFileSync(path, "utf8")]] : [];
+  }));
   rmSync(resolve(root, "indexing"), { recursive: true, force: true });
   rmSync(resolve(root, "examples", "envio"), { recursive: true, force: true });
   rmSync(resolve(root, "examples", "graph"), { recursive: true, force: true });
-  for (const [relativePath, content] of artifacts) {
+  for (const [relativePath, content] of [...artifacts, ...preserved]) {
     const path = resolve(root, relativePath);
     mkdirSync(dirname(path), { recursive: true });
     writeFileSync(path, content);
@@ -61,7 +70,7 @@ if (mode === "--write") {
     if (!existsSync(path) || readFileSync(path, "utf8") !== expected) drift.push(relativePath);
   }
   const generatedRoots = [resolve(root, "indexing"), resolve(root, "examples", "envio"), resolve(root, "examples", "graph")];
-  const expectedPaths = new Set(artifacts.keys());
+  const expectedPaths = new Set([...artifacts.keys(), ...preservedPaths]);
   for (const generatedRoot of generatedRoots) {
     for (const path of listFiles(generatedRoot)) {
       const relativePath = path.slice(root.length + 1);
@@ -75,6 +84,7 @@ if (mode === "--write") {
 function listFiles(directory) {
   if (!existsSync(directory)) return [];
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    if (ignoredGeneratedEntries.has(entry.name)) return [];
     const path = resolve(directory, entry.name);
     return entry.isDirectory() ? listFiles(path) : [path];
   });
@@ -105,7 +115,8 @@ Amounts are raw integers. Their \`semantic\` labels identify units, but pricing,
 valuation, attribution, confirmation policy, and storage design belong to the consumer.
 
 Complete Envio and The Graph starters live in the repository's \`examples/\` directory. They are
-generated and drift-checked, but intentionally are not part of the npm package API.
+generated, lockfile-pinned, and drift-checked, but intentionally are not part of the npm package API.
+Their separate CLI dependency graphs are monitored by Dependabot.
 `;
 }
 
@@ -157,8 +168,10 @@ function envioSchema() {
 
 function envioPackage() {
   return {
+    name: "@reptilianhq/launch-on-block-envio-example",
     private: true,
     type: "module",
+    engines: { node: ">=22 <23" },
     scripts: {
       codegen: "envio codegen",
       typecheck: "tsc --noEmit",
@@ -197,7 +210,7 @@ tokens and graduation pools. It is generated from the SDK catalog.
    paths.
 2. Set \`ENVIO_ROBINHOOD_MAINNET_RPC_URL\` and \`ENVIO_ROBINHOOD_TESTNET_RPC_URL\` to archive-capable
    endpoints, then add your confirmation/reorg policy to \`config.yaml\`.
-3. Run \`npm install && npm run check\`, then \`npm start\`.
+3. Use Node.js 22, then run \`npm ci && npm run check\` and \`npm start\`.
 
 The schema is deliberately event-shaped. Build pricing, liquidity, valuation, and application read
 models separately so raw protocol amounts are never silently presented as priced values.
@@ -281,6 +294,7 @@ function graphNetworks(networks) {
 
 function graphPackage() {
   return {
+    name: "@reptilianhq/launch-on-block-graph-example",
     private: true,
     scripts: {
       check: "npm run codegen:mainnet && npm run build:mainnet && npm run codegen:testnet && npm run build:testnet",
@@ -303,7 +317,7 @@ launch-token and graduation-pool data sources. Mainnet and testnet share one sch
 1. Copy this directory together with the repository's \`indexing/\` directory, preserving their relative
    paths.
 2. Configure the Robinhood network aliases from \`networks.json\` in your Graph Node.
-3. Run \`npm install && npm run codegen:mainnet && npm run build:mainnet\` (or the testnet variants).
+3. Run \`npm ci && npm run codegen:mainnet && npm run build:mainnet\` (or the testnet variants).
 
 The discovery events are the authoritative initial records. A dynamic template created while handling
 an event may not replay earlier logs emitted by that new contract in the same transaction.
