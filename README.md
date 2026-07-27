@@ -186,4 +186,5 @@ sources can move here later without changing the established public boundary.
 
 Apache-2.0. Proprietary and open-source applications may use the SDK without relicensing their own
 code. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). Releases through `0.5.0` remain available under
-their original GPL-3.0-only terms; Apache-2.0 applies beginning with `0.6.0`.
+their original GPL-3.0-only terms; Apache-2.0 applies beginning with `0.6.0`. The ownership audit for
+the transition is recorded in [`docs/RELICENSING.md`](docs/RELICENSING.md).

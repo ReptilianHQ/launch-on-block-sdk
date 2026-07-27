@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
@@ -9,15 +10,24 @@ const manifest = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"))
 const license = readFileSync(resolve(root, "LICENSE"), "utf8");
 const notice = readFileSync(resolve(root, "NOTICE"), "utf8");
 const packDir = mkdtempSync(resolve(tmpdir(), "launch-on-block-sdk-pack-"));
+const expectedLicenseSha256 = "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30";
+const expectedNotice = [
+  "Launch On Block SDK",
+  "Copyright 2026 Tyler Wanner",
+  "",
+  "This product includes software developed for the Launch On Block protocol.",
+  "",
+].join("\n");
 
 if (manifest.license !== "Apache-2.0") {
   throw new Error(`expected Apache-2.0 package license, received ${manifest.license}`);
 }
-if (!license.includes("Apache License") || !license.includes("Version 2.0, January 2004")) {
-  throw new Error("LICENSE does not contain the Apache License 2.0 text");
+const licenseSha256 = createHash("sha256").update(license).digest("hex");
+if (licenseSha256 !== expectedLicenseSha256) {
+  throw new Error(`LICENSE does not match the canonical Apache-2.0 text: ${licenseSha256}`);
 }
-if (!notice.includes("Copyright 2026 ReptilianHQ")) {
-  throw new Error("NOTICE does not contain the ReptilianHQ copyright attribution");
+if (notice !== expectedNotice) {
+  throw new Error("NOTICE does not match the reviewed copyright attribution");
 }
 
 function exportedPaths(exports, paths = []) {
