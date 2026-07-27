@@ -7,7 +7,7 @@ tokens and graduation pools. It is generated from the SDK catalog.
    paths.
 2. Set `ENVIO_ROBINHOOD_MAINNET_RPC_URL` and `ENVIO_ROBINHOOD_TESTNET_RPC_URL` to archive-capable
    endpoints, then add your confirmation/reorg policy to `config.yaml`.
-3. Run `npm install && npm run check`, then `npm start`.
+3. Use Node.js 22, then run `npm ci && npm run check` and `npm start`.
 
 The schema is deliberately event-shaped. Build pricing, liquidity, valuation, and application read
 models separately so raw protocol amounts are never silently presented as priced values.

@@ -1,7 +1,16 @@
 {
   "name": "@reptilianhq/launch-on-block-sdk",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Public TypeScript SDK, contract interfaces, ABIs, and deployment metadata for integrating with the Launch On Block protocol.",
+  "keywords": [
+    "ethereum",
+    "indexing",
+    "robinhood-chain",
+    "sdk",
+    "smart-contracts",
+    "typescript",
+    "web3"
+  ],
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -79,7 +88,7 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "check": "npm run check:artifacts && npm run build && npm run check:public && npm run check:indexing && npm run test:unit && npm run test:pack",
+    "check": "npm run check:artifacts && npm run build && npm run check:public && npm run check:indexing && npm run test:scripts && npm run test:unit && npm run test:pack",
     "check:artifacts": "node scripts/check-artifacts.mjs",
     "check:indexing": "node scripts/indexing-artifacts.mjs --check",
     "check:public": "node scripts/check-public-boundary.mjs",
@@ -87,6 +96,7 @@
     "build": "npm run clean && tsc -p tsconfig.json && node scripts/sanitize-built-deployments.mjs",
     "prepack": "npm run build",
     "test": "npm run check",
+    "test:scripts": "node --test scripts/*.node-test.mjs",
     "test:unit": "tsc -p tsconfig.test.json && vitest run",
     "test:pack": "node scripts/pack.mjs",
     "verify:deployment": "npm run build && node scripts/verify-deployment.mjs"
@@ -96,7 +106,7 @@
   },
   "devDependencies": {
     "typescript": "^5.7.3",
-    "viem": "^2.55.2",
+    "viem": "^2.55.10",
     "vitest": "4.1.10"
   }
 }

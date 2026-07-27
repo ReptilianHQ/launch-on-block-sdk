@@ -3,9 +3,23 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { launchOnBlockEventCatalog, listIndexingManifests } from "../dist/indexing.js";
+import { validateExamplePackageFiles } from "./example-lockfiles.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const mode = process.argv[2];
+const preservedPaths = [
+  "examples/envio/README.md",
+  "examples/envio/package.json",
+  "examples/envio/package-lock.json",
+  "examples/graph/README.md",
+  "examples/graph/package.json",
+  "examples/graph/package-lock.json",
+];
+const examplePackagePairs = [
+  ["examples/envio/package.json", "examples/envio/package-lock.json"],
+  ["examples/graph/package.json", "examples/graph/package-lock.json"],
+];
+const ignoredGeneratedEntries = new Set(["node_modules", ".envio", "build", "generated", "envio-env.d.ts"]);
 
 if (mode !== "--write" && mode !== "--check") {
   throw new Error("usage: node scripts/indexing-artifacts.mjs --write|--check");
@@ -25,14 +39,10 @@ const artifacts = new Map([
   ["indexing/manifest.schema.json", json(indexingManifestSchema())],
   ["indexing/README.md", indexingReadme()],
   ["examples/envio/config.yaml", envioConfig(manifests)],
-  ["examples/envio/package.json", json(envioPackage())],
-  ["examples/envio/README.md", envioReadme()],
   ["examples/envio/schema.graphql", envioSchema()],
   ["examples/envio/tsconfig.json", json(envioTsconfig())],
   ["examples/envio/src/EventHandlers.ts", envioHandlers()],
   ["examples/graph/networks.json", json(graphNetworks(manifests))],
-  ["examples/graph/package.json", json(graphPackage())],
-  ["examples/graph/README.md", graphReadme()],
   ["examples/graph/schema.graphql", graphSchema()],
 ]);
 
@@ -45,10 +55,16 @@ for (const manifest of manifests) {
 }
 
 if (mode === "--write") {
+  const preserved = new Map(preservedPaths.map((relativePath) => {
+    const path = resolve(root, relativePath);
+    if (!existsSync(path)) throw new Error(`required maintained example file is missing: ${relativePath}`);
+    return [relativePath, readFileSync(path, "utf8")];
+  }));
+  validateExamplePackages();
   rmSync(resolve(root, "indexing"), { recursive: true, force: true });
   rmSync(resolve(root, "examples", "envio"), { recursive: true, force: true });
   rmSync(resolve(root, "examples", "graph"), { recursive: true, force: true });
-  for (const [relativePath, content] of artifacts) {
+  for (const [relativePath, content] of [...artifacts, ...preserved]) {
     const path = resolve(root, relativePath);
     mkdirSync(dirname(path), { recursive: true });
     writeFileSync(path, content);
@@ -61,20 +77,32 @@ if (mode === "--write") {
     if (!existsSync(path) || readFileSync(path, "utf8") !== expected) drift.push(relativePath);
   }
   const generatedRoots = [resolve(root, "indexing"), resolve(root, "examples", "envio"), resolve(root, "examples", "graph")];
-  const expectedPaths = new Set(artifacts.keys());
+  const expectedPaths = new Set([...artifacts.keys(), ...preservedPaths]);
   for (const generatedRoot of generatedRoots) {
     for (const path of listFiles(generatedRoot)) {
       const relativePath = path.slice(root.length + 1);
       if (!expectedPaths.has(relativePath)) drift.push(relativePath);
     }
   }
+  try {
+    validateExamplePackages();
+  } catch (error) {
+    drift.push(error instanceof Error ? error.message : String(error));
+  }
   if (drift.length > 0) throw new Error(`indexing artifacts are stale, missing, or unexpected: ${drift.join(", ")}`);
   console.log(`verified ${artifacts.size} indexing artifacts`);
+}
+
+function validateExamplePackages() {
+  for (const [packagePath, lockPath] of examplePackagePairs) {
+    validateExamplePackageFiles(root, packagePath, lockPath);
+  }
 }
 
 function listFiles(directory) {
   if (!existsSync(directory)) return [];
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    if (ignoredGeneratedEntries.has(entry.name)) return [];
     const path = resolve(directory, entry.name);
     return entry.isDirectory() ? listFiles(path) : [path];
   });
@@ -105,7 +133,8 @@ Amounts are raw integers. Their \`semantic\` labels identify units, but pricing,
 valuation, attribution, confirmation policy, and storage design belong to the consumer.
 
 Complete Envio and The Graph starters live in the repository's \`examples/\` directory. They are
-generated and drift-checked, but intentionally are not part of the npm package API.
+generated, lockfile-pinned, and drift-checked, but intentionally are not part of the npm package API.
+Their separate CLI dependency graphs are monitored by Dependabot.
 `;
 }
 
@@ -155,21 +184,6 @@ function envioSchema() {
   return `${entitySchema("envio")}\n`;
 }
 
-function envioPackage() {
-  return {
-    private: true,
-    type: "module",
-    scripts: {
-      codegen: "envio codegen",
-      typecheck: "tsc --noEmit",
-      check: "npm run codegen && npm run typecheck",
-      start: "envio dev",
-    },
-    dependencies: { envio: "3.2.1" },
-    devDependencies: { typescript: "5.7.3" },
-  };
-}
-
 function envioTsconfig() {
   return {
     compilerOptions: {
@@ -185,23 +199,6 @@ function envioTsconfig() {
     },
     include: ["envio-env.d.ts", "src/**/*.ts"],
   };
-}
-
-function envioReadme() {
-  return `# Envio starter
-
-This example stores one immutable decoded entity per public event and dynamically registers launch
-tokens and graduation pools. It is generated from the SDK catalog.
-
-1. Copy this directory together with the repository's \`indexing/\` directory, preserving their relative
-   paths.
-2. Set \`ENVIO_ROBINHOOD_MAINNET_RPC_URL\` and \`ENVIO_ROBINHOOD_TESTNET_RPC_URL\` to archive-capable
-   endpoints, then add your confirmation/reorg policy to \`config.yaml\`.
-3. Run \`npm install && npm run check\`, then \`npm start\`.
-
-The schema is deliberately event-shaped. Build pricing, liquidity, valuation, and application read
-models separately so raw protocol amounts are never silently presented as priced values.
-`;
 }
 
 function envioHandlers() {
@@ -277,37 +274,6 @@ function graphNetworks(networks) {
     releaseId: network.releaseId,
     startBlock: network.startBlock,
   }]));
-}
-
-function graphPackage() {
-  return {
-    private: true,
-    scripts: {
-      check: "npm run codegen:mainnet && npm run build:mainnet && npm run codegen:testnet && npm run build:testnet",
-      "codegen:mainnet": "graph codegen subgraph.mainnet.yaml",
-      "codegen:testnet": "graph codegen subgraph.testnet.yaml",
-      "build:mainnet": "graph build subgraph.mainnet.yaml",
-      "build:testnet": "graph build subgraph.testnet.yaml",
-    },
-    dependencies: { "@graphprotocol/graph-ts": "0.38.2" },
-    devDependencies: { "@graphprotocol/graph-cli": "0.98.1" },
-  };
-}
-
-function graphReadme() {
-  return `# The Graph starter
-
-This example stores every decoded public event parameter in immutable entities and registers dynamic
-launch-token and graduation-pool data sources. Mainnet and testnet share one schema and mapping source.
-
-1. Copy this directory together with the repository's \`indexing/\` directory, preserving their relative
-   paths.
-2. Configure the Robinhood network aliases from \`networks.json\` in your Graph Node.
-3. Run \`npm install && npm run codegen:mainnet && npm run build:mainnet\` (or the testnet variants).
-
-The discovery events are the authoritative initial records. A dynamic template created while handling
-an event may not replay earlier logs emitted by that new contract in the same transaction.
-`;
 }
 
 function graphNetworkSlug(network) {

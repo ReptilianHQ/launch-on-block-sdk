@@ -1,4 +1,5 @@
 {
+  "name": "@reptilianhq/launch-on-block-graph-example",
   "private": true,
   "scripts": {
     "check": "npm run codegen:mainnet && npm run build:mainnet && npm run codegen:testnet && npm run build:testnet",

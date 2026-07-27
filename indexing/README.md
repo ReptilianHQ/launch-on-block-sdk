@@ -18,4 +18,5 @@ Amounts are raw integers. Their `semantic` labels identify units, but pricing, d
 valuation, attribution, confirmation policy, and storage design belong to the consumer.
 
 Complete Envio and The Graph starters live in the repository's `examples/` directory. They are
-generated and drift-checked, but intentionally are not part of the npm package API.
+generated, lockfile-pinned, and drift-checked, but intentionally are not part of the npm package API.
+Their separate CLI dependency graphs are monitored by Dependabot.

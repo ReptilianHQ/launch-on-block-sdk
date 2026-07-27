@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.1
+
+- Align public documentation and release metadata with the supported npm line.
+- Make generated indexing examples reproducible with committed lockfiles.
+- Refresh verified tooling dependencies and consolidate automated update noise.
+
 ## 0.7.0
 
 - Remove operational deployment fields from public types and runtime manifests.

@@ -88,8 +88,6 @@ npm install @reptilianhq/launch-on-block-sdk viem
 Releases use npm trusted publishing with provenance from the public GitHub repository and protected
 release environment. See [`docs/RELEASING.md`](docs/RELEASING.md).
 
-Version `0.7.0` publishes the hardened public-repository and package boundary under Apache-2.0.
-
 ## Usage
 
 Import ABIs from narrow package subpaths so TypeScript preserves their literal types:
@@ -196,6 +194,7 @@ sources can move here later without changing the established public boundary.
 ## License
 
 Apache-2.0. Proprietary and open-source applications may use the SDK without relicensing their own
-code. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). Releases through `0.5.0` remain available under
-their original GPL-3.0-only terms; Apache-2.0 applies beginning with `0.6.0`. The ownership audit for
-the transition is recorded in [`docs/RELICENSING.md`](docs/RELICENSING.md).
+code. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). Historical tags through `0.5.0` retain their
+original GPL-3.0-only terms; Apache-2.0 applies beginning with `0.6.0`. Superseded npm versions through
+`0.6.0` were withdrawn after the public boundary was hardened. The ownership audit for the transition
+is recorded in [`docs/RELICENSING.md`](docs/RELICENSING.md).

@@ -2,8 +2,8 @@
 
 ## Supported versions
 
-Security fixes are released from the current minor line. Consumers should use the npm `latest` version;
-older minor lines receive fixes only when maintainers explicitly announce extended support.
+Only the npm `latest` version receives security fixes. Superseded versions are unsupported and may be
+withdrawn from the registry; historical Git tags remain available for provenance and license records.
 
 ## Reporting a vulnerability
 

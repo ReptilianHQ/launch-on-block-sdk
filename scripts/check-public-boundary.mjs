@@ -62,6 +62,8 @@ for (const path of [
   ".github/ISSUE_TEMPLATE/bug_report.yml",
   ".github/ISSUE_TEMPLATE/integration_request.yml",
   ".github/pull_request_template.md",
+  "examples/envio/package-lock.json",
+  "examples/graph/package-lock.json",
 ]) {
   if (!existsSync(resolve(root, path))) throw new Error(`public repository is missing ${path}`);
 }
