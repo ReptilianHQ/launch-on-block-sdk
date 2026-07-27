@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
@@ -6,7 +7,28 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const manifest = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
+const license = readFileSync(resolve(root, "LICENSE"), "utf8");
+const notice = readFileSync(resolve(root, "NOTICE"), "utf8");
 const packDir = mkdtempSync(resolve(tmpdir(), "launch-on-block-sdk-pack-"));
+const expectedLicenseSha256 = "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30";
+const expectedNotice = [
+  "Launch On Block SDK",
+  "Copyright 2026 Tyler Wanner",
+  "",
+  "This product includes software developed for the Launch On Block protocol.",
+  "",
+].join("\n");
+
+if (manifest.license !== "Apache-2.0") {
+  throw new Error(`expected Apache-2.0 package license, received ${manifest.license}`);
+}
+const licenseSha256 = createHash("sha256").update(license).digest("hex");
+if (licenseSha256 !== expectedLicenseSha256) {
+  throw new Error(`LICENSE does not match the canonical Apache-2.0 text: ${licenseSha256}`);
+}
+if (notice !== expectedNotice) {
+  throw new Error("NOTICE does not match the reviewed copyright attribution");
+}
 
 function exportedPaths(exports, paths = []) {
   if (typeof exports === "string") {
@@ -44,7 +66,7 @@ try {
   const literalExportFiles = exportFiles.filter((path) => !path.includes("*"));
   const wildcardExportFiles = exportFiles.filter((path) => path.includes("*"));
   const files = new Set(result.files.map(({ path }) => path));
-  const expected = ["CHANGELOG.md", "LICENSE", "README.md", ...literalExportFiles];
+  const expected = ["CHANGELOG.md", "LICENSE", "NOTICE", "README.md", ...literalExportFiles];
   const missing = expected.filter((path) => !files.has(path));
   if (missing.length > 0) throw new Error(`packed SDK is missing: ${missing.join(", ")}`);
   const unmatchedWildcardExports = wildcardExportFiles.filter((pattern) => {
