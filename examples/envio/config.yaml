@@ -1,0 +1,70 @@
+# yaml-language-server: $schema=./node_modules/envio/evm.schema.json
+# Generated from the SDK public indexing boundary. Add RPC/provider policy for your environment.
+name: launch-on-block-public-events
+description: Decoded Launch On Block public integration events.
+rollback_on_reorg: true
+raw_events: false
+address_format: lowercase
+
+contracts:
+  - name: Launchpad
+    abi_file_path: ../../indexing/abis/Launchpad.events.json
+    events:
+      - event: LaunchCreated
+      - event: CurveAvailabilitySet
+      - event: CurveRegistered
+      - event: CurveSelected
+      - event: Buy
+      - event: Sell
+      - event: Graduated
+      - event: Claimed
+  - name: Router
+    abi_file_path: ../../indexing/abis/Router.events.json
+    events:
+      - event: Swap
+  - name: FeeController
+    abi_file_path: ../../indexing/abis/FeeController.events.json
+    events:
+      - event: FeesCollected
+  - name: LaunchToken
+    abi_file_path: ../../indexing/abis/LaunchToken.events.json
+    events:
+      - event: Approval
+      - event: Transfer
+  - name: GraduationPool
+    abi_file_path: ../../indexing/abis/GraduationPool.events.json
+    events:
+      - event: Swap
+      - event: ProtocolFeesCollected
+
+chains:
+  - id: 4663
+    start_block: 17957183
+    contracts:
+      - name: Launchpad
+        start_block: 17957183
+        address:
+          - "0x135492b3ccb2cb64749f91332f929f49a1deed3f"
+      - name: Router
+        start_block: 17957183
+        address:
+          - "0xf3fcb520def7473f0eeb473a73cade20a2eb1f4a"
+      - name: FeeController
+        start_block: 17957183
+        address:
+          - "0xbd885463e6e0f24ee467f173719a7330ade1ca01"
+  - id: 46630
+    start_block: 92793378
+    contracts:
+      - name: Launchpad
+        start_block: 92793378
+        address:
+          - "0x9fe4f17b53a520c4c8672c945285574a7396340f"
+      - name: Router
+        start_block: 92793378
+        address:
+          - "0xf06e880a714cb8683850a29d435b86bd9f14523d"
+      - name: FeeController
+        start_block: 92793378
+        address:
+          - "0x19809b400d7d160fc71a261f8415b29556e63487"

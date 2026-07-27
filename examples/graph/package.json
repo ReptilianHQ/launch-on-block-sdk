@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "scripts": {
+    "codegen:mainnet": "graph codegen subgraph.mainnet.yaml",
+    "codegen:testnet": "graph codegen subgraph.testnet.yaml",
+    "build:mainnet": "graph build subgraph.mainnet.yaml",
+    "build:testnet": "graph build subgraph.testnet.yaml"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-ts": "0.38.2"
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "0.98.1"
+  }
+}

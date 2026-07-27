@@ -22,6 +22,7 @@
   "sideEffects": false,
   "files": [
     "dist",
+    "indexing",
     "README.md",
     "CHANGELOG.md"
   ],
@@ -57,12 +58,29 @@
     "./compatibility": {
       "types": "./dist/compatibility.d.ts",
       "import": "./dist/compatibility.js"
-    }
+    },
+    "./escrows": {
+      "types": "./dist/escrows.d.ts",
+      "import": "./dist/escrows.js"
+    },
+    "./indexing": {
+      "types": "./dist/indexing.d.ts",
+      "import": "./dist/indexing.js"
+    },
+    "./indexing/manifest.json": "./indexing/manifest.json",
+    "./indexing/manifest.schema.json": "./indexing/manifest.schema.json",
+    "./indexing/abis/Launchpad.events.json": "./indexing/abis/Launchpad.events.json",
+    "./indexing/abis/Router.events.json": "./indexing/abis/Router.events.json",
+    "./indexing/abis/FeeController.events.json": "./indexing/abis/FeeController.events.json",
+    "./indexing/abis/LaunchToken.events.json": "./indexing/abis/LaunchToken.events.json",
+    "./indexing/abis/GraduationPool.events.json": "./indexing/abis/GraduationPool.events.json"
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "check": "npm run check:artifacts && npm run build && npm run test:unit && npm run test:pack",
+    "check": "npm run check:artifacts && npm run build && npm run check:indexing && npm run test:unit && npm run test:pack",
     "check:artifacts": "node scripts/check-artifacts.mjs",
+    "check:indexing": "node scripts/indexing-artifacts.mjs --check",
+    "generate:indexing": "npm run build && node scripts/indexing-artifacts.mjs --write",
     "build": "npm run clean && tsc -p tsconfig.json",
     "prepack": "npm run build",
     "test": "npm run check",

@@ -1,0 +1,648 @@
+{
+  "$schema": "./manifest.schema.json",
+  "schemaVersion": 1,
+  "coverage": "public_integration_events",
+  "abiRevision": "sha256:635cf660979631c57c4fa5cdf28460f8a4293272ebe153f0064e3758c6a5b9be",
+  "contracts": [
+    {
+      "name": "Launchpad",
+      "abiFile": "abis/Launchpad.events.json",
+      "sourceKind": "fixed",
+      "discoveredBy": null,
+      "events": [
+        {
+          "name": "LaunchCreated",
+          "signature": "LaunchCreated(address,address,uint16,uint16,address,string)",
+          "topic0": "0xae76055728f8aa67cf9f5fb3080ad262991120b513b585fe5b4f1b211ea84321",
+          "description": "A launch token and its creator payout terms were created.",
+          "parameters": [
+            {
+              "name": "token",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "creator",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "creatorBps",
+              "type": "uint16",
+              "indexed": false,
+              "semantic": "basis_points"
+            },
+            {
+              "name": "curveFeeBps",
+              "type": "uint16",
+              "indexed": false,
+              "semantic": "basis_points"
+            },
+            {
+              "name": "payoutWallet",
+              "type": "address",
+              "indexed": false,
+              "semantic": "address"
+            },
+            {
+              "name": "metadataURI",
+              "type": "string",
+              "indexed": false,
+              "semantic": "uri"
+            }
+          ]
+        },
+        {
+          "name": "CurveAvailabilitySet",
+          "signature": "CurveAvailabilitySet(uint32,bool)",
+          "topic0": "0x57cfe4386279da1da40cdbaade7782f43734d07a64168a98d128d04461f3b20c",
+          "description": "Availability of a registered curve for new launches changed.",
+          "parameters": [
+            {
+              "name": "curveId",
+              "type": "uint32",
+              "indexed": true,
+              "semantic": "integer"
+            },
+            {
+              "name": "enabledForNewLaunches",
+              "type": "bool",
+              "indexed": false,
+              "semantic": "boolean"
+            }
+          ]
+        },
+        {
+          "name": "CurveRegistered",
+          "signature": "CurveRegistered(uint32,address,bytes32)",
+          "topic0": "0x937ac0525d2e3efe8f3d36d844189c3218f41ea62bdcacbb53964d0980d03abf",
+          "description": "A curve implementation and reviewed code hash were registered.",
+          "parameters": [
+            {
+              "name": "curveId",
+              "type": "uint32",
+              "indexed": true,
+              "semantic": "integer"
+            },
+            {
+              "name": "implementation",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "codeHash",
+              "type": "bytes32",
+              "indexed": false,
+              "semantic": "hash"
+            }
+          ]
+        },
+        {
+          "name": "CurveSelected",
+          "signature": "CurveSelected(address,uint32,address,uint256)",
+          "topic0": "0x93d0ea63035b087d509c5205e9955afee7efa90be606c4750371bf020b992c8f",
+          "description": "A launch token selected a curve implementation and quote target.",
+          "parameters": [
+            {
+              "name": "token",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "curveId",
+              "type": "uint32",
+              "indexed": true,
+              "semantic": "integer"
+            },
+            {
+              "name": "implementation",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "quoteTarget",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_native_quote_amount"
+            }
+          ]
+        },
+        {
+          "name": "Buy",
+          "signature": "Buy(address,address,uint256,uint256)",
+          "topic0": "0x89f5adc174562e07c9c9b1cae7109bbecb21cf9d1b2847e550042b8653c54a0e",
+          "description": "A buyer exchanged native quote value for launch tokens on the active curve.",
+          "parameters": [
+            {
+              "name": "token",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "buyer",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "amountIn",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_native_quote_amount"
+            },
+            {
+              "name": "tokensOut",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_launch_token_amount"
+            }
+          ]
+        },
+        {
+          "name": "Sell",
+          "signature": "Sell(address,address,uint256,uint256)",
+          "topic0": "0xa082022e93cfcd9f1da5f9236718053910f7e840da080c789c7845698dc032ff",
+          "description": "A seller exchanged launch tokens for native quote value on the active curve.",
+          "parameters": [
+            {
+              "name": "token",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "seller",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "tokensIn",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_launch_token_amount"
+            },
+            {
+              "name": "amountOut",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_native_quote_amount"
+            }
+          ]
+        },
+        {
+          "name": "Graduated",
+          "signature": "Graduated(address,address,uint256,uint256,uint256,uint256,uint256,uint256)",
+          "topic0": "0xebd15c0efd3024e10b75dc0272a4893ec00a7a5adb4bf6668801c297a9f79c2c",
+          "description": "A launch completed its curve and allocated assets into its graduation pool.",
+          "parameters": [
+            {
+              "name": "token",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "pool",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "totalRaised",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_native_quote_amount"
+            },
+            {
+              "name": "creatorCut",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_native_quote_amount"
+            },
+            {
+              "name": "protocolCut",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_native_quote_amount"
+            },
+            {
+              "name": "poolQuote",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_native_quote_amount"
+            },
+            {
+              "name": "poolTokens",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_launch_token_amount"
+            },
+            {
+              "name": "burnedTokens",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_launch_token_amount"
+            }
+          ]
+        },
+        {
+          "name": "Claimed",
+          "signature": "Claimed(address,uint256)",
+          "topic0": "0xd8138f8a3f377c5259ca548e70e4c2de94f129f5a11036a15b69513cba2b426a",
+          "description": "A pending native payout was claimed by its recipient.",
+          "parameters": [
+            {
+              "name": "to",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "amount",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_native_quote_amount"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Router",
+      "abiFile": "abis/Router.events.json",
+      "sourceKind": "fixed",
+      "discoveredBy": null,
+      "events": [
+        {
+          "name": "Swap",
+          "signature": "Swap(address,address,uint256,uint256,address)",
+          "topic0": "0xb39c9bc43f811e1a7ce159c5f147458fdb80266bf23c17322013316e27e086d0",
+          "description": "The protocol Router completed a swap through the selected pool.",
+          "parameters": [
+            {
+              "name": "sender",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "pool",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "amountIn",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_input_token_amount"
+            },
+            {
+              "name": "amountOut",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_output_token_amount"
+            },
+            {
+              "name": "to",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FeeController",
+      "abiFile": "abis/FeeController.events.json",
+      "sourceKind": "fixed",
+      "discoveredBy": null,
+      "events": [
+        {
+          "name": "FeesCollected",
+          "signature": "FeesCollected(address,address,uint256,uint256,uint256,uint256,uint256,uint256)",
+          "topic0": "0x1fd846e4ee427de8cd8f9f636ed3c354da3f960948ac1980379a271d7bbdede4",
+          "description": "Pool fees were collected and split between protocol and creator amounts.",
+          "parameters": [
+            {
+              "name": "pair",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "caller",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "amount0",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_token0_amount"
+            },
+            {
+              "name": "amount1",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_token1_amount"
+            },
+            {
+              "name": "protocolAmount0",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_token0_amount"
+            },
+            {
+              "name": "protocolAmount1",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_token1_amount"
+            },
+            {
+              "name": "creatorAmount0",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_token0_amount"
+            },
+            {
+              "name": "creatorAmount1",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_token1_amount"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LaunchToken",
+      "abiFile": "abis/LaunchToken.events.json",
+      "sourceKind": "dynamic",
+      "discoveredBy": {
+        "contract": "Launchpad",
+        "event": "LaunchCreated",
+        "addressParameter": "token"
+      },
+      "events": [
+        {
+          "name": "Approval",
+          "signature": "Approval(address,address,uint256)",
+          "topic0": "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+          "description": "An ERC-20 allowance was set.",
+          "parameters": [
+            {
+              "name": "owner",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "spender",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_launch_token_amount"
+            }
+          ]
+        },
+        {
+          "name": "Transfer",
+          "signature": "Transfer(address,address,uint256)",
+          "topic0": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+          "description": "Launch tokens moved between addresses, including mint and burn transfers.",
+          "parameters": [
+            {
+              "name": "from",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "to",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "value",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_launch_token_amount"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "GraduationPool",
+      "abiFile": "abis/GraduationPool.events.json",
+      "sourceKind": "dynamic",
+      "discoveredBy": {
+        "contract": "Launchpad",
+        "event": "Graduated",
+        "addressParameter": "pool"
+      },
+      "events": [
+        {
+          "name": "Swap",
+          "signature": "Swap(address,uint256,uint256,uint256,uint256,address)",
+          "topic0": "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822",
+          "description": "A graduation pool completed a token0/token1 swap.",
+          "parameters": [
+            {
+              "name": "sender",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "amount0In",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_token0_amount"
+            },
+            {
+              "name": "amount1In",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_token1_amount"
+            },
+            {
+              "name": "amount0Out",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_token0_amount"
+            },
+            {
+              "name": "amount1Out",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_token1_amount"
+            },
+            {
+              "name": "to",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            }
+          ]
+        },
+        {
+          "name": "ProtocolFeesCollected",
+          "signature": "ProtocolFeesCollected(address,uint256,uint256)",
+          "topic0": "0xd24ccccf373129a9579bb9f5edc41c09218d54ae950e90b4d5ca2927b7c29b11",
+          "description": "Accrued graduation-pool protocol fees were collected.",
+          "parameters": [
+            {
+              "name": "to",
+              "type": "address",
+              "indexed": true,
+              "semantic": "address"
+            },
+            {
+              "name": "amount0",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_token0_amount"
+            },
+            {
+              "name": "amount1",
+              "type": "uint256",
+              "indexed": false,
+              "semantic": "raw_token1_amount"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "networks": [
+    {
+      "schemaVersion": 1,
+      "coverage": "public_integration_events",
+      "caip2": "eip155:4663",
+      "chainId": 4663,
+      "network": "robinhood-chain-mainnet",
+      "deploymentId": "4663:launchpad:0x135492b3ccb2cb64749f91332f929f49a1deed3f:17957183",
+      "releaseId": "gen-12",
+      "abiRevision": "sha256:635cf660979631c57c4fa5cdf28460f8a4293272ebe153f0064e3758c6a5b9be",
+      "startBlock": 17957183,
+      "sources": [
+        {
+          "contract": "Launchpad",
+          "kind": "fixed",
+          "address": "0x135492B3cCb2cb64749F91332F929F49a1DeeD3F",
+          "startBlock": 17957183,
+          "discoveredBy": null
+        },
+        {
+          "contract": "Router",
+          "kind": "fixed",
+          "address": "0xf3FCB520dEF7473f0eeB473a73Cade20A2EB1f4a",
+          "startBlock": 17957183,
+          "discoveredBy": null
+        },
+        {
+          "contract": "FeeController",
+          "kind": "fixed",
+          "address": "0xbD885463e6e0F24eE467f173719a7330ADE1Ca01",
+          "startBlock": 17957183,
+          "discoveredBy": null
+        },
+        {
+          "contract": "LaunchToken",
+          "kind": "dynamic",
+          "address": null,
+          "startBlock": null,
+          "discoveredBy": {
+            "contract": "Launchpad",
+            "event": "LaunchCreated",
+            "addressParameter": "token"
+          }
+        },
+        {
+          "contract": "GraduationPool",
+          "kind": "dynamic",
+          "address": null,
+          "startBlock": null,
+          "discoveredBy": {
+            "contract": "Launchpad",
+            "event": "Graduated",
+            "addressParameter": "pool"
+          }
+        }
+      ]
+    },
+    {
+      "schemaVersion": 1,
+      "coverage": "public_integration_events",
+      "caip2": "eip155:46630",
+      "chainId": 46630,
+      "network": "robinhood-chain-testnet",
+      "deploymentId": "46630:launchpad:0x9fe4f17b53a520c4c8672c945285574a7396340f:92793378",
+      "releaseId": "gen-12",
+      "abiRevision": "sha256:635cf660979631c57c4fa5cdf28460f8a4293272ebe153f0064e3758c6a5b9be",
+      "startBlock": 92793378,
+      "sources": [
+        {
+          "contract": "Launchpad",
+          "kind": "fixed",
+          "address": "0x9fe4f17B53A520C4C8672C945285574a7396340f",
+          "startBlock": 92793378,
+          "discoveredBy": null
+        },
+        {
+          "contract": "Router",
+          "kind": "fixed",
+          "address": "0xF06E880A714Cb8683850A29d435B86Bd9F14523d",
+          "startBlock": 92793378,
+          "discoveredBy": null
+        },
+        {
+          "contract": "FeeController",
+          "kind": "fixed",
+          "address": "0x19809B400D7d160fC71A261F8415B29556E63487",
+          "startBlock": 92793378,
+          "discoveredBy": null
+        },
+        {
+          "contract": "LaunchToken",
+          "kind": "dynamic",
+          "address": null,
+          "startBlock": null,
+          "discoveredBy": {
+            "contract": "Launchpad",
+            "event": "LaunchCreated",
+            "addressParameter": "token"
+          }
+        },
+        {
+          "contract": "GraduationPool",
+          "kind": "dynamic",
+          "address": null,
+          "startBlock": null,
+          "discoveredBy": {
+            "contract": "Launchpad",
+            "event": "Graduated",
+            "addressParameter": "pool"
+          }
+        }
+      ]
+    }
+  ]
+}

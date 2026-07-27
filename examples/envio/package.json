@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "codegen": "envio codegen",
+    "start": "envio dev"
+  },
+  "dependencies": {
+    "envio": "3.2.1"
+  }
+}

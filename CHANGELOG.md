@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Clarify public ABI boundaries while retaining internal deployment compatibility checks.
+- Add verified read-only launch escrow reconciliation without valuation semantics.
+- Publish neutral indexing assets and runnable Graph and Envio integration examples.
+
 ## 0.4.3
 
 - Isolate registry integrity verification in a retryable post-publish job and tolerate npm propagation delay.
