@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "es2022"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "es2022",
+    "verbatimModuleSyntax": true
+  },
+  "include": [
+    "envio-env.d.ts",
+    "src/**/*.ts"
+  ]
+}

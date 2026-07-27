@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -17,6 +17,15 @@ function exportedPaths(exports, paths = []) {
   return paths;
 }
 
+function directoryFiles(directory, prefix = "") {
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
+    return entry.isDirectory()
+      ? directoryFiles(resolve(directory, entry.name), relativePath)
+      : [relativePath];
+  });
+}
+
 try {
   rmSync(resolve(root, "dist"), { recursive: true, force: true });
   const packed = spawnSync(
@@ -32,12 +41,40 @@ try {
   }
 
   const exportFiles = exportedPaths(manifest.exports);
+  const literalExportFiles = exportFiles.filter((path) => !path.includes("*"));
+  const wildcardExportFiles = exportFiles.filter((path) => path.includes("*"));
   const files = new Set(result.files.map(({ path }) => path));
-  const expected = ["CHANGELOG.md", "LICENSE", "README.md", ...exportFiles];
+  const expected = ["CHANGELOG.md", "LICENSE", "README.md", ...literalExportFiles];
   const missing = expected.filter((path) => !files.has(path));
   if (missing.length > 0) throw new Error(`packed SDK is missing: ${missing.join(", ")}`);
+  const unmatchedWildcardExports = wildcardExportFiles.filter((pattern) => {
+    const [prefix, suffix] = pattern.split("*");
+    return ![...files].some((path) => path.startsWith(prefix) && path.endsWith(suffix));
+  });
+  if (unmatchedWildcardExports.length > 0) {
+    throw new Error(`packed SDK has unmatched wildcard exports: ${unmatchedWildcardExports.join(", ")}`);
+  }
+  const indexingFiles = directoryFiles(resolve(root, "indexing")).map((path) => `indexing/${path}`);
+  const missingIndexingFiles = indexingFiles.filter((path) => !files.has(path));
+  if (missingIndexingFiles.length > 0) {
+    throw new Error(`packed SDK is missing indexing artifacts: ${missingIndexingFiles.join(", ")}`);
+  }
 
-  console.log(`packed ${result.name}@${result.version} with all ${exportFiles.length} exported files`);
+  const internalVerificationFiles = ["dist/generated/abis.js", "dist/generated/abis.d.ts"];
+  const missingInternalVerificationFiles = internalVerificationFiles.filter((path) => !files.has(path));
+  if (missingInternalVerificationFiles.length > 0) {
+    throw new Error(
+      `packed SDK is missing internal verification artifacts: ${missingInternalVerificationFiles.join(", ")}`,
+    );
+  }
+  const generatedExports = Object.keys(manifest.exports).filter((path) => path.startsWith("./generated"));
+  if (generatedExports.length > 0) {
+    throw new Error(`generated verification artifacts must not be public exports: ${generatedExports.join(", ")}`);
+  }
+
+  console.log(
+    `packed ${result.name}@${result.version} with all ${exportFiles.length} export targets and internal verification artifacts`,
+  );
 } finally {
   rmSync(packDir, { recursive: true, force: true });
 }

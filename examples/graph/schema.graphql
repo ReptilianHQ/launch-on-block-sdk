@@ -1,0 +1,229 @@
+# Generated decoded-event entities. Build domain read models from these immutable records.
+type LaunchpadLaunchCreatedEvent @entity(immutable: true) {
+  id: Bytes!
+  network: String!
+  emitter: Bytes!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  token: Bytes!
+  creator: Bytes!
+  creatorBps: BigInt!
+  curveFeeBps: BigInt!
+  payoutWallet: Bytes!
+  metadataURI: String!
+}
+
+type LaunchpadCurveAvailabilitySetEvent @entity(immutable: true) {
+  id: Bytes!
+  network: String!
+  emitter: Bytes!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  curveId: BigInt!
+  enabledForNewLaunches: Boolean!
+}
+
+type LaunchpadCurveRegisteredEvent @entity(immutable: true) {
+  id: Bytes!
+  network: String!
+  emitter: Bytes!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  curveId: BigInt!
+  implementation: Bytes!
+  codeHash: Bytes!
+}
+
+type LaunchpadCurveSelectedEvent @entity(immutable: true) {
+  id: Bytes!
+  network: String!
+  emitter: Bytes!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  token: Bytes!
+  curveId: BigInt!
+  implementation: Bytes!
+  quoteTarget: BigInt!
+}
+
+type LaunchpadBuyEvent @entity(immutable: true) {
+  id: Bytes!
+  network: String!
+  emitter: Bytes!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  token: Bytes!
+  buyer: Bytes!
+  amountIn: BigInt!
+  tokensOut: BigInt!
+}
+
+type LaunchpadSellEvent @entity(immutable: true) {
+  id: Bytes!
+  network: String!
+  emitter: Bytes!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  token: Bytes!
+  seller: Bytes!
+  tokensIn: BigInt!
+  amountOut: BigInt!
+}
+
+type LaunchpadGraduatedEvent @entity(immutable: true) {
+  id: Bytes!
+  network: String!
+  emitter: Bytes!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  token: Bytes!
+  pool: Bytes!
+  totalRaised: BigInt!
+  creatorCut: BigInt!
+  protocolCut: BigInt!
+  poolQuote: BigInt!
+  poolTokens: BigInt!
+  burnedTokens: BigInt!
+}
+
+type LaunchpadClaimedEvent @entity(immutable: true) {
+  id: Bytes!
+  network: String!
+  emitter: Bytes!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  to: Bytes!
+  amount: BigInt!
+}
+
+type RouterSwapEvent @entity(immutable: true) {
+  id: Bytes!
+  network: String!
+  emitter: Bytes!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  sender: Bytes!
+  pool: Bytes!
+  amountIn: BigInt!
+  amountOut: BigInt!
+  to: Bytes!
+}
+
+type FeeControllerFeesCollectedEvent @entity(immutable: true) {
+  id: Bytes!
+  network: String!
+  emitter: Bytes!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  pair: Bytes!
+  caller: Bytes!
+  amount0: BigInt!
+  amount1: BigInt!
+  protocolAmount0: BigInt!
+  protocolAmount1: BigInt!
+  creatorAmount0: BigInt!
+  creatorAmount1: BigInt!
+}
+
+type LaunchTokenApprovalEvent @entity(immutable: true) {
+  id: Bytes!
+  network: String!
+  emitter: Bytes!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  owner: Bytes!
+  spender: Bytes!
+  value: BigInt!
+}
+
+type LaunchTokenTransferEvent @entity(immutable: true) {
+  id: Bytes!
+  network: String!
+  emitter: Bytes!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  from: Bytes!
+  to: Bytes!
+  value: BigInt!
+}
+
+type GraduationPoolSwapEvent @entity(immutable: true) {
+  id: Bytes!
+  network: String!
+  emitter: Bytes!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  sender: Bytes!
+  amount0In: BigInt!
+  amount1In: BigInt!
+  amount0Out: BigInt!
+  amount1Out: BigInt!
+  to: Bytes!
+}
+
+type GraduationPoolProtocolFeesCollectedEvent @entity(immutable: true) {
+  id: Bytes!
+  network: String!
+  emitter: Bytes!
+  blockNumber: BigInt!
+  blockHash: Bytes!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  to: Bytes!
+  amount0: BigInt!
+  amount1: BigInt!
+}

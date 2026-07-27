@@ -1,0 +1,134 @@
+# Generated from the SDK public indexing boundary. Configure this network alias in Graph Node.
+specVersion: 1.3.0
+description: Launch On Block public integration events for robinhood-chain-testnet
+repository: https://github.com/ReptilianHQ/launch-on-block-sdk
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Launchpad
+    network: robinhood-chain-testnet
+    source:
+      address: '0x9fe4f17B53A520C4C8672C945285574a7396340f'
+      abi: Launchpad
+      startBlock: 92793378
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - LaunchpadLaunchCreatedEvent
+        - LaunchpadCurveAvailabilitySetEvent
+        - LaunchpadCurveRegisteredEvent
+        - LaunchpadCurveSelectedEvent
+        - LaunchpadBuyEvent
+        - LaunchpadSellEvent
+        - LaunchpadGraduatedEvent
+        - LaunchpadClaimedEvent
+      abis:
+        - name: Launchpad
+          file: ../../indexing/abis/Launchpad.events.json
+      eventHandlers:
+        - event: LaunchCreated(indexed address,indexed address,uint16,uint16,address,string)
+          handler: handleLaunchpadLaunchCreatedEvent
+        - event: CurveAvailabilitySet(indexed uint32,bool)
+          handler: handleLaunchpadCurveAvailabilitySetEvent
+        - event: CurveRegistered(indexed uint32,indexed address,bytes32)
+          handler: handleLaunchpadCurveRegisteredEvent
+        - event: CurveSelected(indexed address,indexed uint32,indexed address,uint256)
+          handler: handleLaunchpadCurveSelectedEvent
+        - event: Buy(indexed address,indexed address,uint256,uint256)
+          handler: handleLaunchpadBuyEvent
+        - event: Sell(indexed address,indexed address,uint256,uint256)
+          handler: handleLaunchpadSellEvent
+        - event: Graduated(indexed address,indexed address,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleLaunchpadGraduatedEvent
+        - event: Claimed(indexed address,uint256)
+          handler: handleLaunchpadClaimedEvent
+      file: ./src/Launchpad.ts
+
+  - kind: ethereum/contract
+    name: Router
+    network: robinhood-chain-testnet
+    source:
+      address: '0xF06E880A714Cb8683850A29d435B86Bd9F14523d'
+      abi: Router
+      startBlock: 92793378
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - RouterSwapEvent
+      abis:
+        - name: Router
+          file: ../../indexing/abis/Router.events.json
+      eventHandlers:
+        - event: Swap(indexed address,indexed address,uint256,uint256,indexed address)
+          handler: handleRouterSwapEvent
+      file: ./src/Router.ts
+
+  - kind: ethereum/contract
+    name: FeeController
+    network: robinhood-chain-testnet
+    source:
+      address: '0x19809B400D7d160fC71A261F8415B29556E63487'
+      abi: FeeController
+      startBlock: 92793378
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - FeeControllerFeesCollectedEvent
+      abis:
+        - name: FeeController
+          file: ../../indexing/abis/FeeController.events.json
+      eventHandlers:
+        - event: FeesCollected(indexed address,indexed address,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleFeeControllerFeesCollectedEvent
+      file: ./src/FeeController.ts
+templates:
+  - kind: ethereum/contract
+    name: LaunchToken
+    network: robinhood-chain-testnet
+    source:
+      abi: LaunchToken
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - LaunchTokenApprovalEvent
+        - LaunchTokenTransferEvent
+      abis:
+        - name: LaunchToken
+          file: ../../indexing/abis/LaunchToken.events.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleLaunchTokenApprovalEvent
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleLaunchTokenTransferEvent
+      file: ./src/LaunchToken.ts
+
+  - kind: ethereum/contract
+    name: GraduationPool
+    network: robinhood-chain-testnet
+    source:
+      abi: GraduationPool
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - GraduationPoolSwapEvent
+        - GraduationPoolProtocolFeesCollectedEvent
+      abis:
+        - name: GraduationPool
+          file: ../../indexing/abis/GraduationPool.events.json
+      eventHandlers:
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleGraduationPoolSwapEvent
+        - event: ProtocolFeesCollected(indexed address,uint256,uint256)
+          handler: handleGraduationPoolProtocolFeesCollectedEvent
+      file: ./src/GraduationPool.ts

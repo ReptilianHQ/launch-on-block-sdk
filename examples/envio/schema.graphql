@@ -1,0 +1,228 @@
+type LaunchpadLaunchCreatedEvent {
+  id: ID!
+  chainId: BigInt!
+  emitter: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  token: String!
+  creator: String!
+  creatorBps: BigInt!
+  curveFeeBps: BigInt!
+  payoutWallet: String!
+  metadataURI: String!
+}
+
+type LaunchpadCurveAvailabilitySetEvent {
+  id: ID!
+  chainId: BigInt!
+  emitter: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  curveId: BigInt!
+  enabledForNewLaunches: Boolean!
+}
+
+type LaunchpadCurveRegisteredEvent {
+  id: ID!
+  chainId: BigInt!
+  emitter: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  curveId: BigInt!
+  implementation: String!
+  codeHash: String!
+}
+
+type LaunchpadCurveSelectedEvent {
+  id: ID!
+  chainId: BigInt!
+  emitter: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  token: String!
+  curveId: BigInt!
+  implementation: String!
+  quoteTarget: BigInt!
+}
+
+type LaunchpadBuyEvent {
+  id: ID!
+  chainId: BigInt!
+  emitter: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  token: String!
+  buyer: String!
+  amountIn: BigInt!
+  tokensOut: BigInt!
+}
+
+type LaunchpadSellEvent {
+  id: ID!
+  chainId: BigInt!
+  emitter: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  token: String!
+  seller: String!
+  tokensIn: BigInt!
+  amountOut: BigInt!
+}
+
+type LaunchpadGraduatedEvent {
+  id: ID!
+  chainId: BigInt!
+  emitter: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  token: String!
+  pool: String!
+  totalRaised: BigInt!
+  creatorCut: BigInt!
+  protocolCut: BigInt!
+  poolQuote: BigInt!
+  poolTokens: BigInt!
+  burnedTokens: BigInt!
+}
+
+type LaunchpadClaimedEvent {
+  id: ID!
+  chainId: BigInt!
+  emitter: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  to: String!
+  amount: BigInt!
+}
+
+type RouterSwapEvent {
+  id: ID!
+  chainId: BigInt!
+  emitter: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  sender: String!
+  pool: String!
+  amountIn: BigInt!
+  amountOut: BigInt!
+  to: String!
+}
+
+type FeeControllerFeesCollectedEvent {
+  id: ID!
+  chainId: BigInt!
+  emitter: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  pair: String!
+  caller: String!
+  amount0: BigInt!
+  amount1: BigInt!
+  protocolAmount0: BigInt!
+  protocolAmount1: BigInt!
+  creatorAmount0: BigInt!
+  creatorAmount1: BigInt!
+}
+
+type LaunchTokenApprovalEvent {
+  id: ID!
+  chainId: BigInt!
+  emitter: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  owner: String!
+  spender: String!
+  value: BigInt!
+}
+
+type LaunchTokenTransferEvent {
+  id: ID!
+  chainId: BigInt!
+  emitter: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  from: String!
+  to: String!
+  value: BigInt!
+}
+
+type GraduationPoolSwapEvent {
+  id: ID!
+  chainId: BigInt!
+  emitter: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  sender: String!
+  amount0In: BigInt!
+  amount1In: BigInt!
+  amount0Out: BigInt!
+  amount1Out: BigInt!
+  to: String!
+}
+
+type GraduationPoolProtocolFeesCollectedEvent {
+  id: ID!
+  chainId: BigInt!
+  emitter: String!
+  blockNumber: BigInt!
+  blockHash: String!
+  blockTimestamp: BigInt!
+  transactionHash: String!
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  to: String!
+  amount0: BigInt!
+  amount1: BigInt!
+}

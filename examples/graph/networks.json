@@ -1,0 +1,18 @@
+{
+  "mainnet": {
+    "chainId": 4663,
+    "caip2": "eip155:4663",
+    "graphNetwork": "robinhood-chain-mainnet",
+    "deploymentId": "4663:launchpad:0x135492b3ccb2cb64749f91332f929f49a1deed3f:17957183",
+    "releaseId": "gen-12",
+    "startBlock": 17957183
+  },
+  "testnet": {
+    "chainId": 46630,
+    "caip2": "eip155:46630",
+    "graphNetwork": "robinhood-chain-testnet",
+    "deploymentId": "46630:launchpad:0x9fe4f17b53a520c4c8672c945285574a7396340f:92793378",
+    "releaseId": "gen-12",
+    "startBlock": 92793378
+  }
+}
