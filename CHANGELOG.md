@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.5.0
 
 - Clarify public ABI boundaries while retaining internal deployment compatibility checks.
 - Add verified read-only launch escrow reconciliation without valuation semantics.
