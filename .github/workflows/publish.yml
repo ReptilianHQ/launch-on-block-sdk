@@ -28,6 +28,7 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false
       - name: Require a public provenance source
         run: test "${{ github.event.repository.private }}" = false
       - name: Verify release identity
@@ -77,6 +78,7 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false
       - run: npm ci
       - name: Verify published package integrity
         run: |

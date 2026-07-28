@@ -105,6 +105,8 @@
     "viem": ">=2.21.0 <3"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
+    "publint": "^0.3.22",
     "typescript": "^7.0.2",
     "viem": "^2.55.10",
     "vitest": "4.1.10"

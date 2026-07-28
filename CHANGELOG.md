@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Validate release tarballs across package metadata and ESM type resolution.
+- Audit workflows and dependency automation for supply-chain risks.
+
 ## 0.7.1
 
 - Align public documentation and release metadata with the supported npm line.

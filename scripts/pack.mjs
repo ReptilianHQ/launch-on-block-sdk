@@ -48,6 +48,20 @@ function directoryFiles(directory, prefix = "") {
   });
 }
 
+function runPackageTool(command, args, label) {
+  const result = spawnSync("npm", ["exec", "--offline", "--", command, ...args], {
+    cwd: root,
+    encoding: "utf8",
+    env: {
+      ...process.env,
+      NPM_CONFIG_CACHE: resolve(packDir, "npm-cache"),
+    },
+  });
+  if (result.status !== 0) {
+    throw new Error(`${label} failed:\n${result.stderr || result.stdout}`);
+  }
+}
+
 try {
   rmSync(resolve(root, "dist"), { recursive: true, force: true });
   const packed = spawnSync(
@@ -140,8 +154,12 @@ try {
     throw new Error(`executed packed SDK leaks internal deployment fields: ${leakedPackagedTerms.join(", ")}`);
   }
 
+  const tarballPath = resolve(packDir, result.filename);
+  runPackageTool("publint", [tarballPath, "--pack=false", "--strict"], "publint");
+  runPackageTool("attw", [tarballPath, "--profile", "esm-only"], "Are The Types Wrong");
+
   console.log(
-    `packed ${result.name}@${result.version} with all ${exportFiles.length} export targets and internal verification artifacts`,
+    `packed ${result.name}@${result.version} with all ${exportFiles.length} export targets, internal verification artifacts, publint, and attw`,
   );
 } finally {
   rmSync(packDir, { recursive: true, force: true });
