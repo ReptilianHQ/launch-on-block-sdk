@@ -137,7 +137,8 @@ generated, lockfile-pinned, and drift-checked, but intentionally are not part of
 Their CLIs are development-only, must process trusted inputs in local or disposable environments, and
 must not be deployed as application services. CI requires production-only audits to pass and reports
 the complete toolchain audits without blocking on residual upstream development-tool findings.
-Committed lockfiles make those results reproducible, while Dependabot provides maintainer tracking.
+Committed lockfiles make the audited dependency surfaces reproducible, while Dependabot provides
+maintainer tracking.
 `;
 }
 

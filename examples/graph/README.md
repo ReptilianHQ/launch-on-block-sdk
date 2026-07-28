@@ -14,6 +14,6 @@ an event may not replay earlier logs emitted by that new contract in the same tr
 
 The Graph CLI is development-only tooling. Run it in a local or disposable environment and process
 only trusted manifests, schemas, mappings, and generated inputs. The lockfile is intentionally retained
-for reproducible advisory results. CI gates the example's production dependency surface with
+for a reproducible audited dependency surface. CI gates the example's production dependencies with
 `npm audit --omit=dev`, reports the complete toolchain audit without blocking on upstream CLI findings,
 and leaves Dependabot enabled for maintainer tracking.

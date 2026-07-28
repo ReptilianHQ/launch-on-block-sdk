@@ -14,7 +14,7 @@ models separately so raw protocol amounts are never silently presented as priced
 
 `envio` is development-only tooling. Run this starter in a local or disposable environment, process
 only trusted configuration and generated inputs, and do not expose its development server or deploy
-the starter as an application service. The lockfile is intentionally retained for reproducible
-advisory results. CI gates the example's production dependency surface with `npm audit --omit=dev`,
+the starter as an application service. The lockfile is intentionally retained for a reproducible
+audited dependency surface. CI gates the example's production dependencies with `npm audit --omit=dev`,
 reports the complete toolchain audit without blocking on upstream CLI findings, and leaves Dependabot
 enabled for maintainer tracking.
