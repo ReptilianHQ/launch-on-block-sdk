@@ -11,10 +11,8 @@
     "check": "npm run codegen && npm run typecheck",
     "start": "envio dev"
   },
-  "dependencies": {
-    "envio": "3.2.1"
-  },
   "devDependencies": {
+    "envio": "3.2.1",
     "typescript": "7.0.2"
   }
 }
