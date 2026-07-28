@@ -6,7 +6,14 @@ launch-token and graduation-pool data sources. Mainnet and testnet share one sch
 1. Copy this directory together with the repository's `indexing/` directory, preserving their relative
    paths.
 2. Configure the Robinhood network aliases from `networks.json` in your Graph Node.
-3. Run `npm ci && npm run codegen:mainnet && npm run build:mainnet` (or the testnet variants).
+3. Run `npm ci --ignore-scripts && npm run codegen:mainnet && npm run build:mainnet` (or the testnet
+   variants).
 
 The discovery events are the authoritative initial records. A dynamic template created while handling
 an event may not replay earlier logs emitted by that new contract in the same transaction.
+
+The Graph CLI is development-only tooling. Run it in a local or disposable environment and process
+only trusted manifests, schemas, mappings, and generated inputs. The lockfile is intentionally retained
+so upstream CLI advisories remain visible and reproducible; CI gates the example's production
+dependency surface with `npm audit --omit=dev` while Dependabot continues to track the complete
+toolchain.

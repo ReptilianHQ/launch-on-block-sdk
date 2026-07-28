@@ -4,6 +4,7 @@
 
 - Validate release tarballs across package metadata and ESM type resolution.
 - Audit workflows and dependency automation for supply-chain risks.
+- Enforce production-only audits for isolated indexing examples.
 
 ## 0.7.1
 

@@ -19,4 +19,6 @@ valuation, attribution, confirmation policy, and storage design belong to the co
 
 Complete Envio and The Graph starters live in the repository's `examples/` directory. They are
 generated, lockfile-pinned, and drift-checked, but intentionally are not part of the npm package API.
-Their separate CLI dependency graphs are monitored by Dependabot.
+Their CLIs are development-only, must process trusted inputs in local or disposable environments, and
+must not be deployed as application services. CI requires production-only audits to pass; committed
+lockfiles and Dependabot keep residual upstream development-tool advisories visible.
