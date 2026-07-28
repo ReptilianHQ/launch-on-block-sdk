@@ -172,8 +172,8 @@ npm test
 `npm test` verifies the reviewed artifact hashes, builds the package, runs the unit suite, and packs the
 exact public exports from a clean `dist` directory. The resulting tarball must pass strict `publint` and
 Are The Types Wrong checks for the SDK's supported ESM resolution modes. CI also audits GitHub Actions
-and Dependabot configuration with pinned `zizmor`. `npm run generate:indexing` regenerates every committed
-indexing artifact from the built SDK catalog; normal checks fail on any drift.
+and Dependabot configuration with a pinned `zizmor` action and scanner release. `npm run generate:indexing`
+regenerates every committed indexing artifact from the built SDK catalog; normal checks fail on any drift.
 
 Do not import Foundry artifact JSON or copy ABI fragments into consumer applications. Foundry artifacts
 contain deployment bytecode and compiler metadata that application bundles do not need, while copied
