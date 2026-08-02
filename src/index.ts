@@ -7,3 +7,4 @@ export * from "./receipts.js";
 export * from "./compatibility.js";
 export * from "./escrows.js";
 export * from "./indexing.js";
+export * from "./vanity.js";
