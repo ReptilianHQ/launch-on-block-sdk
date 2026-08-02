@@ -1,6 +1,6 @@
 {
   "name": "@reptilianhq/launch-on-block-sdk",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "description": "Public TypeScript SDK, contract interfaces, ABIs, and deployment metadata for integrating with the Launch On Block protocol.",
   "keywords": [
     "ethereum",
@@ -77,6 +77,10 @@
     "./indexing": {
       "types": "./dist/indexing.d.ts",
       "import": "./dist/indexing.js"
+    },
+    "./vanity": {
+      "types": "./dist/vanity.d.ts",
+      "import": "./dist/vanity.js"
     },
     "./indexing/manifest.json": "./indexing/manifest.json",
     "./indexing/manifest.schema.json": "./indexing/manifest.schema.json",

@@ -20,6 +20,7 @@ authorization model.
 - Deployment compatibility checks for runtime bytecode, proxies, and cross-contract wiring.
 - A machine-readable public event catalog with neutral assets and runnable Graph and Envio examples.
 - Stable SDK error codes and deterministic protocol arithmetic.
+- Offline LaunchToken CREATE2 prediction and bounded vanity-salt mining.
 
 ## ABI support boundary
 
@@ -120,6 +121,40 @@ const buy = verifyBuyReceipt(receipt, deployment.contracts.launchpad, { token })
 Builders return `{ to, data, value }`. Consumers remain responsible for wallet selection, simulation,
 gas estimation, submission, confirmation depth, and reorg policy.
 
+Predict and mine a vanity launch address without RPC calls, then pass the frozen salt to the standard
+transaction builder:
+
+```ts
+import {
+  buildCreateLaunchTransaction,
+  mineLaunchTokenVanitySalt,
+} from "@reptilianhq/launch-on-block-sdk";
+
+const vanity = mineLaunchTokenVanitySalt({
+  launchpad,
+  creator,
+  name: "Block Gecko",
+  symbol: "BLK",
+  metadataUri,
+  suffix: "b10c",
+  maxAttempts: 250_000,
+});
+if (!vanity) throw new Error("Continue the search from the next salt range");
+
+const request = buildCreateLaunchTransaction(launchpad, {
+  name: "Block Gecko",
+  symbol: "BLK",
+  creatorBps,
+  curveFeeBps,
+  payoutWallet,
+  metadataUri,
+  salt: vanity.salt,
+});
+```
+
+The miner is deterministic CPU work; browser applications should run it in a Web Worker. The predicted
+address is valid only for the exact Launchpad, creator, name, symbol, metadata URI, and salt.
+
 Before enabling writes, prove that the selected RPC serves the deployment described by the SDK:
 
 ```ts
@@ -176,8 +211,10 @@ and Dependabot configuration with a pinned `zizmor` action and scanner release. 
 regenerates every committed indexing artifact from the built SDK catalog; normal checks fail on any drift.
 
 Do not import Foundry artifact JSON or copy ABI fragments into consumer applications. Foundry artifacts
-contain deployment bytecode and compiler metadata that application bundles do not need, while copied
-fragments drift independently from the SDK's compatibility checks.
+contain broad deployment data that application bundles do not need, while copied fragments drift
+independently from the SDK's compatibility checks. The narrow reviewed LaunchToken init code used by
+the vanity helper is intentionally pinned inside the SDK because CREATE2 prediction includes that exact
+bytecode; its regression vector is checked against the production Launchpad.
 
 Contributions are welcome through focused issues and pull requests. See [`CONTRIBUTING.md`](CONTRIBUTING.md)
 for the public boundary, verification commands, and security-reporting expectations.
