@@ -217,7 +217,10 @@ The unit suite includes Hegel property-based invariants (`*.hegel.test.ts`) for 
 transaction constructor, every `verify*Receipt` function, and every pure economic helper: construction
 round trips through the pinned ABI, calldata-mismatch rejection on any single-byte perturbation, receipt
 acceptance with evidence equality, per-field rejection classified by error code, and bounds/round-trip/
-monotonicity properties for the economic math. See
+monotonicity properties for the economic math. `fixtures/robinhood-mainnet.json` pins one finalized
+mainnet receipt per `verify*Receipt` function, replayed in `src/receipts.test.ts` — the property
+suites prove the rejection logic, the pinned receipts prove the encoding against a transaction that
+really happened. See
 [`docs/SDK_STANDARDS.md`](https://github.com/ReptilianHQ/dlmm-site/blob/main/docs/SDK_STANDARDS.md) in
 the `dlmm-site` repository for the shared standard this package is held to and its dated conformance
 table.

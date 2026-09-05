@@ -13,6 +13,9 @@
 - Add Hegel property-based invariant suites for `transactions`, `receipts`, and `economics`,
   closing this package's SDK standard conformance gap for construction round trips, receipt
   evidence classification, and economic bounds/round-trip/monotonicity.
+- Pin one finalized Robinhood Chain mainnet receipt per `verify*Receipt` function in
+  `fixtures/robinhood-mainnet.json`, closing the last open SDK standard conformance item for
+  this package.
 
 ## 0.8.0
 
