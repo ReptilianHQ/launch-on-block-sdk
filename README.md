@@ -21,6 +21,9 @@ authorization model.
 - A machine-readable public event catalog with neutral assets and runnable Graph and Envio examples.
 - Stable SDK error codes and deterministic protocol arithmetic.
 - Offline LaunchToken CREATE2 prediction and bounded vanity-salt mining.
+- Published `./provenance/mainnet.json` and `./provenance/testnet.json` deployment provenance
+  documents, generated at build time from the same reviewed public deployment manifest that
+  `./deployments` exports.
 
 ## ABI support boundary
 
@@ -209,6 +212,18 @@ exact public exports from a clean `dist` directory. The resulting tarball must p
 Are The Types Wrong checks for the SDK's supported ESM resolution modes. CI also audits GitHub Actions
 and Dependabot configuration with a pinned `zizmor` action and scanner release. `npm run generate:indexing`
 regenerates every committed indexing artifact from the built SDK catalog; normal checks fail on any drift.
+
+The unit suite includes Hegel property-based invariants (`*.hegel.test.ts`) for every exported `build*`
+transaction constructor, every `verify*Receipt` function, and every pure economic helper: construction
+round trips through the pinned ABI, calldata-mismatch rejection on any single-byte perturbation, receipt
+acceptance with evidence equality, per-field rejection classified by error code, and bounds/round-trip/
+monotonicity properties for the economic math. `fixtures/robinhood-mainnet.json` pins one finalized
+mainnet receipt per `verify*Receipt` function, replayed in `src/receipts.test.ts` — the property
+suites prove the rejection logic, the pinned receipts prove the encoding against a transaction that
+really happened. See
+[`docs/SDK_STANDARDS.md`](https://github.com/ReptilianHQ/dlmm-site/blob/main/docs/SDK_STANDARDS.md) in
+the `dlmm-site` repository for the shared standard this package is held to and its dated conformance
+table.
 
 Do not import Foundry artifact JSON or copy ABI fragments into consumer applications. Foundry artifacts
 contain broad deployment data that application bundles do not need, while copied fragments drift

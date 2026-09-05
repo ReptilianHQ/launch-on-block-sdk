@@ -17,6 +17,8 @@ if (manifest.packageManager !== "npm@11.16.0") {
 const publicDeploymentFiles = [
   resolve(root, "dist/deployments.d.ts"),
   resolve(root, "dist/generated/deployments.js"),
+  resolve(root, "dist/provenance/mainnet.json"),
+  resolve(root, "dist/provenance/testnet.json"),
 ];
 const forbiddenTerms = [
   "writes_enabled",

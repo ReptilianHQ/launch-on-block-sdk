@@ -338,6 +338,100 @@ export function verifyCurveBuyTransaction(
   return decodeLaunchpadTransaction(transaction.input);
 }
 
+export function verifyCurveSellTransaction(
+  transaction: ConfirmedTransactionLike,
+  launchpad: Address,
+  account: Address,
+  parameters: { token: Address; tokensIn: bigint; minAmountOut: bigint },
+): DecodedLaunchpadTransaction {
+  const expected = buildCurveSellTransaction(launchpad, parameters);
+  assertTransactionMatches(transaction, account, expected, "Launchpad sell");
+  return decodeLaunchpadTransaction(transaction.input);
+}
+
+export function verifyGraduateTransaction(
+  transaction: ConfirmedTransactionLike,
+  launchpad: Address,
+  account: Address,
+  token: Address,
+): DecodedLaunchpadTransaction {
+  const expected = buildGraduateTransaction(launchpad, token);
+  assertTransactionMatches(transaction, account, expected, "Launchpad graduate");
+  return decodeLaunchpadTransaction(transaction.input);
+}
+
+export function verifyClaimTransaction(
+  transaction: ConfirmedTransactionLike,
+  launchpad: Address,
+  account: Address,
+  token?: Address,
+): DecodedLaunchpadTransaction {
+  const expected = buildClaimTransaction(launchpad, token);
+  assertTransactionMatches(transaction, account, expected, "Launchpad claim");
+  return decodeLaunchpadTransaction(transaction.input);
+}
+
+export function verifyApproveTransaction(
+  transaction: ConfirmedTransactionLike,
+  account: Address,
+  parameters: { token: Address; spender: Address; amount: bigint },
+): void {
+  const expected = buildApproveTransaction(parameters.token, parameters.spender, parameters.amount);
+  assertTransactionMatches(transaction, account, expected, "Token approve");
+}
+
+export function verifyRouterBuyTransaction(
+  transaction: ConfirmedTransactionLike,
+  router: Address,
+  account: Address,
+  parameters: { token: Address; minTokensOut: bigint; deadline: bigint; value: bigint },
+): DecodedRouterTransaction {
+  const expected = buildRouterBuyTransaction(router, parameters);
+  assertTransactionMatches(transaction, account, expected, "Router buy");
+  return decodeRouterTransaction(transaction.input);
+}
+
+export function verifyRouterSellTransaction(
+  transaction: ConfirmedTransactionLike,
+  router: Address,
+  account: Address,
+  parameters: { token: Address; tokensIn: bigint; minAmountOut: bigint; deadline: bigint },
+): DecodedRouterTransaction {
+  const expected = buildRouterSellTransaction(router, parameters);
+  assertTransactionMatches(transaction, account, expected, "Router sell");
+  return decodeRouterTransaction(transaction.input);
+}
+
+export function verifySwapExactInTransaction(
+  transaction: ConfirmedTransactionLike,
+  router: Address,
+  account: Address,
+  parameters: {
+    tokenIn: Address;
+    tokenOut: Address;
+    amountIn: bigint;
+    amountOutMin: bigint;
+    recipient: Address;
+    deadline: bigint;
+    value?: bigint;
+  },
+): DecodedRouterTransaction {
+  const expected = buildSwapExactInTransaction(router, parameters);
+  assertTransactionMatches(transaction, account, expected, "Router swapExactIn");
+  return decodeRouterTransaction(transaction.input);
+}
+
+export function verifyCollectFeesTransaction(
+  transaction: ConfirmedTransactionLike,
+  feeController: Address,
+  account: Address,
+  pair: Address,
+  venue: "amm" | "lb",
+): void {
+  const expected = buildCollectFeesTransaction(feeController, pair, venue);
+  assertTransactionMatches(transaction, account, expected, "FeeController collect");
+}
+
 export type DecodedLaunchpadTransaction =
   | {
     functionName: "createLaunch";

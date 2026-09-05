@@ -124,6 +124,8 @@ try {
   const publicDeploymentContents = [
     readFileSync(resolve(root, "dist/deployments.d.ts"), "utf8"),
     readFileSync(resolve(root, "dist/generated/deployments.js"), "utf8"),
+    readFileSync(resolve(root, "dist/provenance/mainnet.json"), "utf8"),
+    readFileSync(resolve(root, "dist/provenance/testnet.json"), "utf8"),
   ].join("\n");
   const forbiddenDeploymentTerms = [
     "writes_enabled",

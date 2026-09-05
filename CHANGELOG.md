@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 0.9.0
+
+- Publish `./provenance/mainnet.json` and `./provenance/testnet.json` deployment provenance
+  documents, generated at build time from the reviewed public deployment manifest.
+- Add `verify*Transaction` calldata verification for every remaining `build*Transaction`
+  function (sell, graduate, claim/claimAll, approve, router buy/sell, swapExactIn, fee
+  collection), matching the existing `verifyCreateLaunchTransaction`/`verifyCurveBuyTransaction`
+  pattern.
+- Add Hegel property-based invariant suites for `transactions`, `receipts`, and `economics`,
+  closing this package's SDK standard conformance gap for construction round trips, receipt
+  evidence classification, and economic bounds/round-trip/monotonicity.
+- Pin one finalized Robinhood Chain mainnet receipt per `verify*Receipt` function in
+  `fixtures/robinhood-mainnet.json`, closing the last open SDK standard conformance item for
+  this package.
+
 ## 0.8.0
 
 - Add offline LaunchToken CREATE2 prediction and bounded vanity-salt mining.

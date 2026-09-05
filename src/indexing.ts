@@ -16,6 +16,7 @@ import {
   routerAbi,
 } from "./generated/abis.js";
 import { deploymentManifest, getDeployment, listChains } from "./deployments.js";
+import { SdkError } from "./errors.js";
 
 export type IndexingContractName =
   | "Launchpad"
@@ -167,7 +168,13 @@ export const launchOnBlockEventCatalog = deepFreeze({
           topic0: toEventSelector(event),
           description: descriptions[key] ?? `${name} emitted ${event.name}.`,
           parameters: event.inputs.map((input) => {
-            if (!input.name) throw new Error(`${key} contains an unnamed event parameter`);
+            if (!input.name) {
+              throw new SdkError("INVALID_ARGUMENT", `${key} contains an unnamed event parameter`, {
+                path: `${key}.inputs`,
+                expected: "every event parameter to be named",
+                actual: "unnamed parameter",
+              });
+            }
             return {
               name: input.name,
               type: input.type,
@@ -184,7 +191,13 @@ export const launchOnBlockEventCatalog = deepFreeze({
 export function getIndexingManifest(chainId: number): IndexingNetworkManifest {
   const deployment = getDeployment(chainId);
   const raw = Object.values(deploymentManifest.robinhood).find((candidate) => candidate.chain_id === chainId);
-  if (!raw || !raw.contracts) throw new Error(`Deployment metadata is incomplete for chain ${chainId}`);
+  if (!raw || !raw.contracts) {
+    throw new SdkError("DEPLOYMENT_NOT_FOUND", `Deployment metadata is incomplete for chain ${chainId}`, {
+      path: "chainId",
+      expected: "a chain with recorded contracts",
+      actual: String(chainId),
+    });
+  }
   const addresses: Record<"Launchpad" | "Router" | "FeeController", Address> = {
     Launchpad: getAddress(deployment.contracts.launchpad),
     Router: getAddress(deployment.contracts.router),
