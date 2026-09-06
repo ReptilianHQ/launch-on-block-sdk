@@ -51,6 +51,12 @@ jobs:
           integrity="$(jq -r '.[0].integrity' <<< "$packed")"
           package="$(node -p 'require("./package.json").name')"
           version="$(node -p 'require("./package.json").version')"
+          # "Verify release identity" already proved the prerelease flag matches
+          # this version string; route the dist-tag accordingly so a verified
+          # prerelease still can't silently become `latest` -- npm does not
+          # infer this from the version string on its own.
+          dist_tag="latest"
+          case "${version}" in *-*) dist_tag="rc" ;; esac
           if remote="$(npm view "${package}@${version}" dist.integrity --json 2>"$RUNNER_TEMP/npm-view.err")"; then
             test "$(jq -r . <<< "$remote")" = "$integrity" || {
               echo "${package}@${version} already exists with different bytes" >&2
@@ -62,7 +68,7 @@ jobs:
               cat "$RUNNER_TEMP/npm-view.err" >&2
               exit 1
             }
-            npm publish "$RUNNER_TEMP/$filename" --access public
+            npm publish "$RUNNER_TEMP/$filename" --access public --tag "${dist_tag}"
           fi
 
   verify:
