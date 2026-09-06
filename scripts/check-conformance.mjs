@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 
-// Vendored from dlmm-site's scripts/check-sdk-conformance.mjs (the shared Protocol SDK
-// Standard's conformance script, see docs/SDK_STANDARDS.md there) so this public,
-// separately-released package is checked by the same rules without a cross-repository
-// runtime dependency. Keep this file's checks in sync with the source when the standard
-// changes. Invoked here as `node scripts/check-conformance.mjs .` against this package's
-// own root.
+// Vendored copy of ReptilianHQ/reptilian scripts/check-sdk-conformance.mjs, the shared Protocol SDK
+// Standard's conformance script (docs/SDK_STANDARDS.md there). This public package
+// releases separately and cannot read the private source, so the source repository
+// checks this copy against its own on every change and emits a fresh one with
+// `node scripts/check-sdk-conformance.vendored.mjs --emit`. Do not edit the body
+// here; scripts/check-conformance.node-test.mjs fails if it no longer matches the
+// hash below. Invoked as `node scripts/check-conformance.mjs .`.
+// Canonical body sha256: e03bec3ea1db3451f3306ca5dd48f432dd061db02a3c9dd445c1f557e6408bb4
 
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve, sep } from 'node:path';

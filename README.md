@@ -221,9 +221,12 @@ monotonicity properties for the economic math. `fixtures/robinhood-mainnet.json`
 mainnet receipt per `verify*Receipt` function, replayed in `src/receipts.test.ts` — the property
 suites prove the rejection logic, the pinned receipts prove the encoding against a transaction that
 really happened. See
-[`docs/SDK_STANDARDS.md`](https://github.com/ReptilianHQ/dlmm-site/blob/main/docs/SDK_STANDARDS.md) in
-the `dlmm-site` repository for the shared standard this package is held to and its dated conformance
-table.
+[`docs/SDK_STANDARDS.md`](https://github.com/ReptilianHQ/reptilian/blob/main/docs/SDK_STANDARDS.md) in
+the `reptilian` repository for the shared standard this package is held to and its dated conformance
+table. `scripts/check-conformance.mjs` is an emitted copy of that repository's conformance script:
+its header records the sha256 of the rule body, `npm run test:scripts` fails if the body no longer
+matches it, and the source repository checks this copy against the canonical rules on every change
+and weekly. Re-emit it from the source rather than editing it here.
 
 Do not import Foundry artifact JSON or copy ABI fragments into consumer applications. Foundry artifacts
 contain broad deployment data that application bundles do not need, while copied fragments drift

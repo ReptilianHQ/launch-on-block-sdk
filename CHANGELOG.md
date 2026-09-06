@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Carry the shared conformance script as an emitted, hash-headed copy checked against its body
+  by `test:scripts`, so a local edit cannot silently change what the package is held to.
+
 ## 0.9.0
 
 - Publish `./provenance/mainnet.json` and `./provenance/testnet.json` deployment provenance
