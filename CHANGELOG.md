@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Indexing integration
+
+- Document indexing recovery boundaries and test discovery receipts, duplicate ingestion, restart, and rollback.
+
 ### Consumer documentation
 
 - Add complete consumer examples and an API reference checked against the packed SDK.
