@@ -196,7 +196,7 @@ than following the internal path shown in that declaration.
 
 ## Package exports
 
-Generated from package version 0.9.0; requires Node >=22 and viem >=2.21.0 <3.
+Generated from package version 0.10.0; requires Node >=22 and viem >=2.21.0 <3.
 
 Import the package root for all named exports, or a narrow module below. JSON entries are data assets, not functions.
 

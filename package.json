@@ -1,6 +1,6 @@
 {
   "name": "@reptilianhq/launch-on-block-sdk",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Public TypeScript SDK, contract interfaces, ABIs, and deployment metadata for integrating with the Launch On Block protocol.",
   "keywords": [
     "ethereum",
@@ -106,14 +106,16 @@
     "prepack": "npm run build",
     "test": "npm run check",
     "test:scripts": "node --test scripts/*.node-test.mjs",
-    "test:unit": "tsc -p tsconfig.test.json && vitest run",
+    "test:unit": "tsc -p tsconfig.test.json && vitest run --exclude \"**/*.fork.test.ts\"",
     "test:pack": "node scripts/pack.mjs",
     "verify:deployment": "npm run build && node scripts/verify-deployment.mjs",
     "check:docs": "node scripts/docs.mjs --check",
     "generate:docs": "npm run build && node scripts/docs.mjs --write",
     "test:indexing": "node --test examples/indexing/replay.node-test.mjs",
     "check:envio-example": "node scripts/check-envio-example.mjs",
-    "prepublishOnly": "npm run check:indexing && npm run check:envio-example && npm test"
+    "prepublishOnly": "npm run check:fork-evidence && npm run check:indexing && npm run check:envio-example && npm test",
+    "test:fork": "node scripts/fork.mjs",
+    "check:fork-evidence": "node scripts/fork.mjs --check-evidence"
   },
   "peerDependencies": {
     "viem": ">=2.21.0 <3"
