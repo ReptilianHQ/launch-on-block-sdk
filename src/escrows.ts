@@ -38,6 +38,9 @@ export type LaunchEscrowState =
 
 /**
  * Reads and verifies the escrow associated with one launch token at a single safe block.
+ * The RPC must retain state at that height. `options.blockNumber` overrides the selected block
+ * under the caller's confirmation policy; an explicit block is not necessarily safe/finalized.
+ * Unavailable historical state propagates as an RPC error without retries or block fallback.
  *
  * The returned `backing` is deliberately unpriced protocol accounting data. Consumers must not
  * present it as liquidity, TVL, redeemable value, or wallet value without a separate reviewed model.

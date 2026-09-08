@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "sourceArtifactSha256": "2184e4e6f4be4c47d1c45c8122f920d8dd9273e3a98fec4911ae3c3c2a94b519",
+  "evidenceSha256": "5598cf6e28511e44a1a415335ba3680846c7b0421421acb515e03c40b61b4a53",
+  "networks": {
+    "mainnet": {
+      "chainId": 4663,
+      "deploymentId": "4663:launchpad:0x135492b3ccb2cb64749f91332f929f49a1deed3f:17957183",
+      "launchpad": "0x135492b3ccb2cb64749f91332f929f49a1deed3f",
+      "startBlock": 17957183,
+      "timelock": "0x4047d08fdf3a19cc86054c6447ca4f86bc9bc952",
+      "observedAtBlock": "57836358"
+    },
+    "testnet": {
+      "chainId": 46630,
+      "deploymentId": "46630:launchpad:0x9fe4f17b53a520c4c8672c945285574a7396340f:92793378",
+      "launchpad": "0x9fe4f17b53a520c4c8672c945285574a7396340f",
+      "startBlock": 92793378,
+      "timelock": "0x423252628908c6c6025190c5a026eb9bb99997f5",
+      "observedAtBlock": "115679076"
+    }
+  }
+}

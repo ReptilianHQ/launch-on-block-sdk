@@ -84,6 +84,10 @@ export interface DeploymentCompatibilityReport {
 /**
  * Proves that an RPC is serving the manifest-bound release before a consumer trusts it.
  * This checks identity and wiring, not operational state such as pause status or balances.
+ * Reads a single numbered `safe` block by default; the RPC must retain state at that height.
+ * `options.blockNumber` selects an explicit block under the caller's confirmation policy.
+ * It does not imply safe/finalized status. Unavailable historical state propagates as an RPC error;
+ * this runtime-neutral helper does not retry or fall back to a more recent block.
  */
 export async function assertCompatibleDeployment(
   client: PublicClient,

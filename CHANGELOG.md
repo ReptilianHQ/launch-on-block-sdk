@@ -4,6 +4,8 @@
 
 ### 2026-09-08
 
+- Preserve safe-block verification with bounded retries and actionable RPC availability guidance.
+- Bind corrected testnet metadata to reviewed evidence while preserving immutable producer artifacts.
 - Document deployment audit findings with reproducible public RPC evidence and explicit verification limits.
 
 - Carry the shared conformance script as an emitted, hash-headed copy checked against its body
