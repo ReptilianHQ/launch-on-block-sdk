@@ -84,7 +84,8 @@ every decoded parameter, register dynamic sources, and are drift-checked without
 The manifest declares `coverage: "public_integration_events"`. This is the reviewed third-party event
 surface, not every event that may exist in the private protocol implementation. Consumers should retain
 the coverage marker and ABI revision with their integration evidence. See
-[`indexing/README.md`](indexing/README.md) for dynamic-source and reorg guidance.
+[`indexing/README.md`](indexing/README.md) for generated artifacts and
+[`docs/INDEXING.md`](docs/INDEXING.md) for discovery, event correlation, recovery tests, and production acceptance.
 
 ## Installation
 
