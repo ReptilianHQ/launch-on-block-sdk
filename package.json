@@ -90,15 +90,17 @@
     "./indexing/abis/LaunchToken.events.json": "./indexing/abis/LaunchToken.events.json",
     "./indexing/abis/GraduationPool.events.json": "./indexing/abis/GraduationPool.events.json",
     "./provenance/mainnet.json": "./dist/provenance/mainnet.json",
-    "./provenance/testnet.json": "./dist/provenance/testnet.json"
+    "./provenance/testnet.json": "./dist/provenance/testnet.json",
+    "./indexing/mainnet.json": "./indexing/mainnet.json",
+    "./indexing/testnet.json": "./indexing/testnet.json"
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "check": "npm run check:artifacts && npm run build && npm run check:public && npm run check:indexing && npm run check:conformance && npm run check:docs && npm run test:scripts && npm run test:unit && npm run test:indexing && npm run test:pack",
+    "check": "npm run check:artifacts && npm run build && npm run check:public && npm run check:indexing && npm run check:conformance && npm run check:docs && npm run test:scripts && npm run test:unit && npm run test:indexing && npm run check:envio-example && npm run test:pack",
     "check:artifacts": "node scripts/check-artifacts.mjs",
     "check:indexing": "node scripts/indexing-artifacts.mjs --check",
     "check:public": "node scripts/check-public-boundary.mjs",
-    "check:conformance": "node scripts/check-conformance.mjs .",
+    "check:conformance": "node scripts/check-conformance.mjs . && node scripts/check-indexing-conformance.mjs .",
     "generate:indexing": "npm run build && node scripts/indexing-artifacts.mjs --write",
     "build": "npm run clean && tsc -p tsconfig.json && node scripts/sanitize-built-deployments.mjs && node scripts/generate-provenance.mjs",
     "prepack": "npm run build",
@@ -109,7 +111,9 @@
     "verify:deployment": "npm run build && node scripts/verify-deployment.mjs",
     "check:docs": "node scripts/docs.mjs --check",
     "generate:docs": "npm run build && node scripts/docs.mjs --write",
-    "test:indexing": "node --test examples/indexing/replay.node-test.mjs"
+    "test:indexing": "node --test examples/indexing/replay.node-test.mjs",
+    "check:envio-example": "node scripts/check-envio-example.mjs",
+    "prepublishOnly": "npm run check:indexing && npm run check:envio-example && npm test"
   },
   "peerDependencies": {
     "viem": ">=2.21.0 <3"

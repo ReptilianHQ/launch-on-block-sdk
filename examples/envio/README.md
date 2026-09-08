@@ -1,7 +1,9 @@
 # Envio starter
 
-This example stores one immutable decoded entity per public event and dynamically registers launch
-tokens and graduation pools. It is generated from the SDK catalog.
+This generated starter stores a canonical `LobProtocolEvent` log plus `LobLaunch`
+and `LobPool` identity/terms read models. Edit the SDK catalog and regenerate,
+not the generated schema or handlers. Event payload integers are decimal strings.
+Envio rolls back orphan log rows and materialized records together.
 
 1. Copy this directory together with the repository's `indexing/` directory, preserving their relative
    paths.
@@ -9,8 +11,12 @@ tokens and graduation pools. It is generated from the SDK catalog.
    endpoints, then add your confirmation/reorg policy to `config.yaml`.
 3. Use Node.js 22, then run `npm ci --ignore-scripts && npm run check` and `npm start`.
 
-The schema is deliberately event-shaped. Build pricing, liquidity, valuation, and application read
-models separately so raw protocol amounts are never silently presented as priced values.
+The previous per-event schema requires a fresh replay into a new database/schema.
+See [the migration and acceptance guide](../../docs/INDEXING.md) before switching
+consumers. Partial launch fields remain null until their evidence arrives;
+conflicting immutable terms fail the handler. Pool identity does not imply
+available reserves or prices. Envio loads handlers from the `src` directory;
+`handlers` is a directory setting, not a TypeScript filename.
 
 `envio` is development-only tooling. Run this starter in a local or disposable environment, process
 only trusted configuration and generated inputs, and do not expose its development server or deploy

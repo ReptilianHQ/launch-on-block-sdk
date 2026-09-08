@@ -25,6 +25,109 @@
       "type": "string",
       "pattern": "^sha256:[0-9a-f]{64}$"
     },
+    "materializations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "description",
+          "key",
+          "fields",
+          "updates"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "key": {
+            "const": "chainId:lowercase-address"
+          },
+          "fields": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "required": [
+                "type",
+                "required"
+              ],
+              "properties": {
+                "type": {
+                  "enum": [
+                    "String",
+                    "BigInt"
+                  ]
+                },
+                "required": {
+                  "type": "boolean"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "updates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "contract",
+                "event",
+                "keyParameter",
+                "set"
+              ],
+              "properties": {
+                "contract": {
+                  "type": "string"
+                },
+                "event": {
+                  "type": "string"
+                },
+                "keyParameter": {
+                  "type": "string"
+                },
+                "set": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "required": [
+                          "parameter"
+                        ],
+                        "properties": {
+                          "parameter": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "blockNumber"
+                        ],
+                        "properties": {
+                          "blockNumber": {
+                            "const": true
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    ]
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
     "contracts": {
       "type": "array",
       "minItems": 1,
@@ -76,6 +179,9 @@
                   "LaunchCreated",
                   "Graduated"
                 ]
+              },
+              "startFrom": {
+                "const": "discovery-block"
               },
               "addressParameter": {
                 "enum": [
@@ -140,6 +246,14 @@
                       "semantic": {
                         "type": "string",
                         "minLength": 1
+                      },
+                      "asset": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "decimalsSource": {
+                        "type": "string",
+                        "minLength": 1
                       }
                     },
                     "additionalProperties": false
@@ -192,6 +306,9 @@
                   },
                   "addressParameter": {
                     "const": "token"
+                  },
+                  "startFrom": {
+                    "const": "discovery-block"
                   }
                 },
                 "additionalProperties": false
@@ -222,6 +339,9 @@
                   },
                   "addressParameter": {
                     "const": "pool"
+                  },
+                  "startFrom": {
+                    "const": "discovery-block"
                   }
                 },
                 "additionalProperties": false
@@ -346,6 +466,9 @@
                         "Graduated"
                       ]
                     },
+                    "startFrom": {
+                      "const": "discovery-block"
+                    },
                     "addressParameter": {
                       "enum": [
                         "token",
@@ -412,6 +535,9 @@
                         },
                         "addressParameter": {
                           "const": "token"
+                        },
+                        "startFrom": {
+                          "const": "discovery-block"
                         }
                       },
                       "additionalProperties": false
@@ -448,6 +574,9 @@
                         },
                         "addressParameter": {
                           "const": "pool"
+                        },
+                        "startFrom": {
+                          "const": "discovery-block"
                         }
                       },
                       "additionalProperties": false

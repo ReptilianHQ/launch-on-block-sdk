@@ -9,13 +9,13 @@ function metadata(event: {
   logIndex: number;
 }) {
   return {
-    id: `${event.chainId}-${event.block.number}-${event.logIndex}`,
+    id: `${event.chainId}:${event.block.hash.toLowerCase()}:${event.logIndex}`,
     chainId: BigInt(event.chainId),
-    emitter: event.srcAddress,
+    emitter: event.srcAddress.toLowerCase(),
     blockNumber: BigInt(event.block.number),
-    blockHash: event.block.hash,
+    blockHash: event.block.hash.toLowerCase(),
     blockTimestamp: BigInt(event.block.timestamp),
-    transactionHash: required(event.transaction.hash, "transaction.hash"),
+    transactionHash: required(event.transaction.hash, "transaction.hash").toLowerCase(),
     transactionIndex: BigInt(required(event.transaction.transactionIndex, "transaction.transactionIndex")),
     logIndex: BigInt(event.logIndex),
   };
@@ -27,148 +27,210 @@ function required<T>(value: T | undefined, field: string): T {
 }
 
 indexer.onEvent({ contract: "Launchpad", event: "LaunchCreated" }, async ({ event, context }) => {
-  context.LaunchpadLaunchCreatedEvent.set({
+  context.LobProtocolEvent.set({
     ...metadata(event),
-    token: event.params.token,
-    creator: event.params.creator,
-    creatorBps: BigInt(event.params.creatorBps),
-    curveFeeBps: BigInt(event.params.curveFeeBps),
-    payoutWallet: event.params.payoutWallet,
-    metadataURI: event.params.metadataURI,
+    contract: "Launchpad", kind: "LaunchCreated", signature: "LaunchCreated(address,address,uint16,uint16,address,string)",
+    payload: JSON.stringify(event.params, (_, value) => typeof value === "bigint" ? value.toString() : value),
   });
+  {
+    const id = `${event.chainId}:${event.params.token.toLowerCase()}`;
+    const existing = await context.LobLaunch.get(id);
+    if (existing?.token != null && existing.token !== event.params.token.toLowerCase()) throw new Error("Conflicting LobLaunch.token evidence");
+    if (existing?.creator != null && existing.creator !== event.params.creator.toLowerCase()) throw new Error("Conflicting LobLaunch.creator evidence");
+    if (existing?.payoutWallet != null && existing.payoutWallet !== event.params.payoutWallet.toLowerCase()) throw new Error("Conflicting LobLaunch.payoutWallet evidence");
+    if (existing?.creatorBps != null && existing.creatorBps !== BigInt(event.params.creatorBps)) throw new Error("Conflicting LobLaunch.creatorBps evidence");
+    if (existing?.curveFeeBps != null && existing.curveFeeBps !== BigInt(event.params.curveFeeBps)) throw new Error("Conflicting LobLaunch.curveFeeBps evidence");
+    if (existing?.metadataURI != null && existing.metadataURI !== event.params.metadataURI) throw new Error("Conflicting LobLaunch.metadataURI evidence");
+    if (existing?.createdBlock != null && existing.createdBlock !== BigInt(event.block.number)) throw new Error("Conflicting LobLaunch.createdBlock evidence");
+    context.LobLaunch.set({
+      id,
+      token: event.params.token.toLowerCase(),
+      creator: event.params.creator.toLowerCase(),
+      payoutWallet: event.params.payoutWallet.toLowerCase(),
+      creatorBps: BigInt(event.params.creatorBps),
+      curveFeeBps: BigInt(event.params.curveFeeBps),
+      metadataURI: event.params.metadataURI,
+      createdBlock: BigInt(event.block.number),
+      curveId: existing?.curveId,
+      curveImpl: existing?.curveImpl,
+      quoteTarget: existing?.quoteTarget,
+      pool: existing?.pool,
+      graduatedBlock: existing?.graduatedBlock,
+    });
+  }
 });
 
 indexer.onEvent({ contract: "Launchpad", event: "CurveAvailabilitySet" }, async ({ event, context }) => {
-  context.LaunchpadCurveAvailabilitySetEvent.set({
+  context.LobProtocolEvent.set({
     ...metadata(event),
-    curveId: BigInt(event.params.curveId),
-    enabledForNewLaunches: event.params.enabledForNewLaunches,
+    contract: "Launchpad", kind: "CurveAvailabilitySet", signature: "CurveAvailabilitySet(uint32,bool)",
+    payload: JSON.stringify(event.params, (_, value) => typeof value === "bigint" ? value.toString() : value),
   });
+
 });
 
 indexer.onEvent({ contract: "Launchpad", event: "CurveRegistered" }, async ({ event, context }) => {
-  context.LaunchpadCurveRegisteredEvent.set({
+  context.LobProtocolEvent.set({
     ...metadata(event),
-    curveId: BigInt(event.params.curveId),
-    implementation: event.params.implementation,
-    codeHash: event.params.codeHash,
+    contract: "Launchpad", kind: "CurveRegistered", signature: "CurveRegistered(uint32,address,bytes32)",
+    payload: JSON.stringify(event.params, (_, value) => typeof value === "bigint" ? value.toString() : value),
   });
+
 });
 
 indexer.onEvent({ contract: "Launchpad", event: "CurveSelected" }, async ({ event, context }) => {
-  context.LaunchpadCurveSelectedEvent.set({
+  context.LobProtocolEvent.set({
     ...metadata(event),
-    token: event.params.token,
-    curveId: BigInt(event.params.curveId),
-    implementation: event.params.implementation,
-    quoteTarget: BigInt(event.params.quoteTarget),
+    contract: "Launchpad", kind: "CurveSelected", signature: "CurveSelected(address,uint32,address,uint256)",
+    payload: JSON.stringify(event.params, (_, value) => typeof value === "bigint" ? value.toString() : value),
   });
+  {
+    const id = `${event.chainId}:${event.params.token.toLowerCase()}`;
+    const existing = await context.LobLaunch.get(id);
+    if (existing?.token != null && existing.token !== event.params.token.toLowerCase()) throw new Error("Conflicting LobLaunch.token evidence");
+    if (existing?.curveId != null && existing.curveId !== BigInt(event.params.curveId)) throw new Error("Conflicting LobLaunch.curveId evidence");
+    if (existing?.curveImpl != null && existing.curveImpl !== event.params.implementation.toLowerCase()) throw new Error("Conflicting LobLaunch.curveImpl evidence");
+    if (existing?.quoteTarget != null && existing.quoteTarget !== BigInt(event.params.quoteTarget)) throw new Error("Conflicting LobLaunch.quoteTarget evidence");
+    context.LobLaunch.set({
+      id,
+      token: event.params.token.toLowerCase(),
+      creator: existing?.creator,
+      payoutWallet: existing?.payoutWallet,
+      creatorBps: existing?.creatorBps,
+      curveFeeBps: existing?.curveFeeBps,
+      metadataURI: existing?.metadataURI,
+      createdBlock: existing?.createdBlock,
+      curveId: BigInt(event.params.curveId),
+      curveImpl: event.params.implementation.toLowerCase(),
+      quoteTarget: BigInt(event.params.quoteTarget),
+      pool: existing?.pool,
+      graduatedBlock: existing?.graduatedBlock,
+    });
+  }
 });
 
 indexer.onEvent({ contract: "Launchpad", event: "Buy" }, async ({ event, context }) => {
-  context.LaunchpadBuyEvent.set({
+  context.LobProtocolEvent.set({
     ...metadata(event),
-    token: event.params.token,
-    buyer: event.params.buyer,
-    amountIn: BigInt(event.params.amountIn),
-    tokensOut: BigInt(event.params.tokensOut),
+    contract: "Launchpad", kind: "Buy", signature: "Buy(address,address,uint256,uint256)",
+    payload: JSON.stringify(event.params, (_, value) => typeof value === "bigint" ? value.toString() : value),
   });
+
 });
 
 indexer.onEvent({ contract: "Launchpad", event: "Sell" }, async ({ event, context }) => {
-  context.LaunchpadSellEvent.set({
+  context.LobProtocolEvent.set({
     ...metadata(event),
-    token: event.params.token,
-    seller: event.params.seller,
-    tokensIn: BigInt(event.params.tokensIn),
-    amountOut: BigInt(event.params.amountOut),
+    contract: "Launchpad", kind: "Sell", signature: "Sell(address,address,uint256,uint256)",
+    payload: JSON.stringify(event.params, (_, value) => typeof value === "bigint" ? value.toString() : value),
   });
+
 });
 
 indexer.onEvent({ contract: "Launchpad", event: "Graduated" }, async ({ event, context }) => {
-  context.LaunchpadGraduatedEvent.set({
+  context.LobProtocolEvent.set({
     ...metadata(event),
-    token: event.params.token,
-    pool: event.params.pool,
-    totalRaised: BigInt(event.params.totalRaised),
-    creatorCut: BigInt(event.params.creatorCut),
-    protocolCut: BigInt(event.params.protocolCut),
-    poolQuote: BigInt(event.params.poolQuote),
-    poolTokens: BigInt(event.params.poolTokens),
-    burnedTokens: BigInt(event.params.burnedTokens),
+    contract: "Launchpad", kind: "Graduated", signature: "Graduated(address,address,uint256,uint256,uint256,uint256,uint256,uint256)",
+    payload: JSON.stringify(event.params, (_, value) => typeof value === "bigint" ? value.toString() : value),
   });
+  {
+    const id = `${event.chainId}:${event.params.token.toLowerCase()}`;
+    const existing = await context.LobLaunch.get(id);
+    if (existing?.token != null && existing.token !== event.params.token.toLowerCase()) throw new Error("Conflicting LobLaunch.token evidence");
+    if (existing?.pool != null && existing.pool !== event.params.pool.toLowerCase()) throw new Error("Conflicting LobLaunch.pool evidence");
+    if (existing?.graduatedBlock != null && existing.graduatedBlock !== BigInt(event.block.number)) throw new Error("Conflicting LobLaunch.graduatedBlock evidence");
+    context.LobLaunch.set({
+      id,
+      token: event.params.token.toLowerCase(),
+      creator: existing?.creator,
+      payoutWallet: existing?.payoutWallet,
+      creatorBps: existing?.creatorBps,
+      curveFeeBps: existing?.curveFeeBps,
+      metadataURI: existing?.metadataURI,
+      createdBlock: existing?.createdBlock,
+      curveId: existing?.curveId,
+      curveImpl: existing?.curveImpl,
+      quoteTarget: existing?.quoteTarget,
+      pool: event.params.pool.toLowerCase(),
+      graduatedBlock: BigInt(event.block.number),
+    });
+  }
+  {
+    const id = `${event.chainId}:${event.params.pool.toLowerCase()}`;
+    const existing = await context.LobPool.get(id);
+    if (existing?.pool != null && existing.pool !== event.params.pool.toLowerCase()) throw new Error("Conflicting LobPool.pool evidence");
+    if (existing?.token != null && existing.token !== event.params.token.toLowerCase()) throw new Error("Conflicting LobPool.token evidence");
+    if (existing?.graduatedBlock != null && existing.graduatedBlock !== BigInt(event.block.number)) throw new Error("Conflicting LobPool.graduatedBlock evidence");
+    context.LobPool.set({
+      id,
+      pool: event.params.pool.toLowerCase(),
+      token: event.params.token.toLowerCase(),
+      graduatedBlock: BigInt(event.block.number),
+    });
+  }
 });
 
 indexer.onEvent({ contract: "Launchpad", event: "Claimed" }, async ({ event, context }) => {
-  context.LaunchpadClaimedEvent.set({
+  context.LobProtocolEvent.set({
     ...metadata(event),
-    to: event.params.to,
-    amount: BigInt(event.params.amount),
+    contract: "Launchpad", kind: "Claimed", signature: "Claimed(address,uint256)",
+    payload: JSON.stringify(event.params, (_, value) => typeof value === "bigint" ? value.toString() : value),
   });
+
 });
 
 indexer.onEvent({ contract: "Router", event: "Swap" }, async ({ event, context }) => {
-  context.RouterSwapEvent.set({
+  context.LobProtocolEvent.set({
     ...metadata(event),
-    sender: event.params.sender,
-    pool: event.params.pool,
-    amountIn: BigInt(event.params.amountIn),
-    amountOut: BigInt(event.params.amountOut),
-    to: event.params.to,
+    contract: "Router", kind: "Swap", signature: "Swap(address,address,uint256,uint256,address)",
+    payload: JSON.stringify(event.params, (_, value) => typeof value === "bigint" ? value.toString() : value),
   });
+
 });
 
 indexer.onEvent({ contract: "FeeController", event: "FeesCollected" }, async ({ event, context }) => {
-  context.FeeControllerFeesCollectedEvent.set({
+  context.LobProtocolEvent.set({
     ...metadata(event),
-    pair: event.params.pair,
-    caller: event.params.caller,
-    amount0: BigInt(event.params.amount0),
-    amount1: BigInt(event.params.amount1),
-    protocolAmount0: BigInt(event.params.protocolAmount0),
-    protocolAmount1: BigInt(event.params.protocolAmount1),
-    creatorAmount0: BigInt(event.params.creatorAmount0),
-    creatorAmount1: BigInt(event.params.creatorAmount1),
+    contract: "FeeController", kind: "FeesCollected", signature: "FeesCollected(address,address,uint256,uint256,uint256,uint256,uint256,uint256)",
+    payload: JSON.stringify(event.params, (_, value) => typeof value === "bigint" ? value.toString() : value),
   });
+
 });
 
 indexer.onEvent({ contract: "LaunchToken", event: "Approval" }, async ({ event, context }) => {
-  context.LaunchTokenApprovalEvent.set({
+  context.LobProtocolEvent.set({
     ...metadata(event),
-    owner: event.params.owner,
-    spender: event.params.spender,
-    value: BigInt(event.params.value),
+    contract: "LaunchToken", kind: "Approval", signature: "Approval(address,address,uint256)",
+    payload: JSON.stringify(event.params, (_, value) => typeof value === "bigint" ? value.toString() : value),
   });
+
 });
 
 indexer.onEvent({ contract: "LaunchToken", event: "Transfer" }, async ({ event, context }) => {
-  context.LaunchTokenTransferEvent.set({
+  context.LobProtocolEvent.set({
     ...metadata(event),
-    from: event.params.from,
-    to: event.params.to,
-    value: BigInt(event.params.value),
+    contract: "LaunchToken", kind: "Transfer", signature: "Transfer(address,address,uint256)",
+    payload: JSON.stringify(event.params, (_, value) => typeof value === "bigint" ? value.toString() : value),
   });
+
 });
 
 indexer.onEvent({ contract: "GraduationPool", event: "Swap" }, async ({ event, context }) => {
-  context.GraduationPoolSwapEvent.set({
+  context.LobProtocolEvent.set({
     ...metadata(event),
-    sender: event.params.sender,
-    amount0In: BigInt(event.params.amount0In),
-    amount1In: BigInt(event.params.amount1In),
-    amount0Out: BigInt(event.params.amount0Out),
-    amount1Out: BigInt(event.params.amount1Out),
-    to: event.params.to,
+    contract: "GraduationPool", kind: "Swap", signature: "Swap(address,uint256,uint256,uint256,uint256,address)",
+    payload: JSON.stringify(event.params, (_, value) => typeof value === "bigint" ? value.toString() : value),
   });
+
 });
 
 indexer.onEvent({ contract: "GraduationPool", event: "ProtocolFeesCollected" }, async ({ event, context }) => {
-  context.GraduationPoolProtocolFeesCollectedEvent.set({
+  context.LobProtocolEvent.set({
     ...metadata(event),
-    to: event.params.to,
-    amount0: BigInt(event.params.amount0),
-    amount1: BigInt(event.params.amount1),
+    contract: "GraduationPool", kind: "ProtocolFeesCollected", signature: "ProtocolFeesCollected(address,uint256,uint256)",
+    payload: JSON.stringify(event.params, (_, value) => typeof value === "bigint" ? value.toString() : value),
   });
+
 });
 
 indexer.contractRegister(

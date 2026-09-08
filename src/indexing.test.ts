@@ -13,9 +13,11 @@ describe("public indexing catalog", () => {
       type: "uint256",
       indexed: false,
       semantic: "raw_native_quote_amount",
+      asset: "chain native quote",
+      decimalsSource: "chain native currency decimals (18 on supported Robinhood chains)",
     });
     expect(launchOnBlockEventCatalog.contracts.find((contract) => contract.name === "LaunchToken")?.discoveredBy)
-      .toEqual({ contract: "Launchpad", event: "LaunchCreated", addressParameter: "token" });
+      .toEqual({ contract: "Launchpad", event: "LaunchCreated", addressParameter: "token", startFrom: "discovery-block" });
   });
 
   it("binds fixed and dynamic sources to the exact release boundary", () => {

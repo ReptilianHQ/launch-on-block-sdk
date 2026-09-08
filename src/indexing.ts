@@ -30,6 +30,8 @@ export interface IndexingEventParameter {
   type: string;
   indexed: boolean;
   semantic: string;
+  asset?: string;
+  decimalsSource?: string;
 }
 
 export interface IndexingEventDefinition {
@@ -48,6 +50,7 @@ export interface IndexingContractDefinition {
     contract: "Launchpad";
     event: "LaunchCreated" | "Graduated";
     addressParameter: "token" | "pool";
+    startFrom: "discovery-block";
   };
   eventAbi: readonly AbiEvent[];
   events: readonly IndexingEventDefinition[];
@@ -125,6 +128,15 @@ const semanticOverrides: Record<string, Record<string, string>> = {
   "LaunchToken.Transfer": { value: "raw_launch_token_amount" },
 };
 
+const amountSemantics: Record<string, { asset: string; decimalsSource: string }> = {
+  raw_native_quote_amount: { asset: "chain native quote", decimalsSource: "chain native currency decimals (18 on supported Robinhood chains)" },
+  raw_launch_token_amount: { asset: "event token parameter, or emitting LaunchToken", decimalsSource: "token decimals() at the indexed block" },
+  raw_token0_amount: { asset: "pool token0() (event pair for FeeController)", decimalsSource: "token0 decimals() at the indexed block" },
+  raw_token1_amount: { asset: "pool token1() (event pair for FeeController)", decimalsSource: "token1 decimals() at the indexed block" },
+  raw_input_token_amount: { asset: "routed input asset; resolve from transaction calldata and pool identity", decimalsSource: "resolved input asset decimals at the indexed block; native quote uses chain decimals" },
+  raw_output_token_amount: { asset: "routed output asset; resolve from transaction calldata and pool identity", decimalsSource: "resolved output asset decimals at the indexed block; native quote uses chain decimals" },
+};
+
 const definitions: ReadonlyArray<{
   name: IndexingContractName;
   abi: Abi;
@@ -138,13 +150,66 @@ const definitions: ReadonlyArray<{
     name: "LaunchToken",
     abi: launchTokenAbi,
     sourceKind: "dynamic",
-    discoveredBy: { contract: "Launchpad", event: "LaunchCreated", addressParameter: "token" },
+    discoveredBy: { contract: "Launchpad", event: "LaunchCreated", addressParameter: "token", startFrom: "discovery-block" },
   },
   {
     name: "GraduationPool",
     abi: graduationPoolAbi,
     sourceKind: "dynamic",
-    discoveredBy: { contract: "Launchpad", event: "Graduated", addressParameter: "pool" },
+    discoveredBy: { contract: "Launchpad", event: "Graduated", addressParameter: "pool", startFrom: "discovery-block" },
+  },
+];
+
+export interface IndexingMaterialization {
+  name: string;
+  description: string;
+  key: "chainId:lowercase-address";
+  fields: Record<string, { type: "String" | "BigInt"; required: boolean }>;
+  updates: readonly {
+    contract: IndexingContractName;
+    event: string;
+    keyParameter: string;
+    set: Record<string, { parameter: string } | { blockNumber: true }>;
+  }[];
+}
+
+// Each event owns distinct fields. Partial rows preserve evidence when discovery
+// events arrive in either order; conflicting immutable identity fails closed.
+const materializations: readonly IndexingMaterialization[] = [
+  {
+    name: "LobLaunch",
+    description: "Launch identity and payout terms joined by chain/token. Preserve partial curve and graduation evidence; no balances or price inference.",
+    key: "chainId:lowercase-address",
+    fields: {
+      token: { type: "String", required: true }, creator: { type: "String", required: false },
+      payoutWallet: { type: "String", required: false }, creatorBps: { type: "BigInt", required: false },
+      curveFeeBps: { type: "BigInt", required: false }, metadataURI: { type: "String", required: false },
+      createdBlock: { type: "BigInt", required: false }, curveId: { type: "BigInt", required: false },
+      curveImpl: { type: "String", required: false }, quoteTarget: { type: "BigInt", required: false },
+      pool: { type: "String", required: false }, graduatedBlock: { type: "BigInt", required: false },
+    },
+    updates: [
+      { contract: "Launchpad", event: "LaunchCreated", keyParameter: "token", set: {
+        token: { parameter: "token" }, creator: { parameter: "creator" }, payoutWallet: { parameter: "payoutWallet" },
+        creatorBps: { parameter: "creatorBps" }, curveFeeBps: { parameter: "curveFeeBps" },
+        metadataURI: { parameter: "metadataURI" }, createdBlock: { blockNumber: true },
+      } },
+      { contract: "Launchpad", event: "CurveSelected", keyParameter: "token", set: {
+        token: { parameter: "token" }, curveId: { parameter: "curveId" }, curveImpl: { parameter: "implementation" }, quoteTarget: { parameter: "quoteTarget" },
+      } },
+      { contract: "Launchpad", event: "Graduated", keyParameter: "token", set: {
+        token: { parameter: "token" }, pool: { parameter: "pool" }, graduatedBlock: { blockNumber: true },
+      } },
+    ],
+  },
+  {
+    name: "LobPool",
+    description: "Protocol pool membership proven by Launchpad.Graduated; token0/token1 and reserves require separate reviewed evidence.",
+    key: "chainId:lowercase-address",
+    fields: { pool: { type: "String", required: true }, token: { type: "String", required: true }, graduatedBlock: { type: "BigInt", required: true } },
+    updates: [{ contract: "Launchpad", event: "Graduated", keyParameter: "pool", set: {
+      pool: { parameter: "pool" }, token: { parameter: "token" }, graduatedBlock: { blockNumber: true },
+    } }],
   },
 ];
 
@@ -152,6 +217,7 @@ export const launchOnBlockEventCatalog = deepFreeze({
   schemaVersion: 1 as const,
   coverage: "public_integration_events" as const,
   abiRevision: ABI_REVISION,
+  materializations,
   contracts: definitions.map(({ name, abi, sourceKind, discoveredBy }): IndexingContractDefinition => {
     const eventAbi = abi.filter((item): item is AbiEvent => item.type === "event");
     return {
@@ -180,6 +246,7 @@ export const launchOnBlockEventCatalog = deepFreeze({
               type: input.type,
               indexed: input.indexed ?? false,
               semantic: semanticOverrides[key]?.[input.name] ?? defaultSemantic(input.type),
+              ...amountSemantics[semanticOverrides[key]?.[input.name] ?? ""],
             };
           }),
         };

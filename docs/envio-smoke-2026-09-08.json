@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-09-08T21:19:59.119Z",
+  "chainId": 4663,
+  "rpc": "https://rpc.mainnet.chain.robinhood.com",
+  "range": {
+    "fromBlock": 18582638,
+    "toBlock": 18582640
+  },
+  "nodeVersion": "v24.18.0",
+  "envioVersion": "3.2.1",
+  "handlersSha256": "67d7cd525a8cec133a42df9ff030dbf1c04fa066c43a3cbb51e89934a6e0e02f",
+  "configSha256": "ca981abb50d94d44a2221cb108f9e51e8395c56f6b8358d5e6abb9f76d382380",
+  "result": "PASS",
+  "eventCount": 4,
+  "launchCount": 1,
+  "poolCount": 0,
+  "eventKinds": [
+    "Transfer",
+    "Transfer",
+    "LaunchCreated",
+    "CurveSelected"
+  ],
+  "resumedWithoutReset": true,
+  "beforeSha256": "4c6abce7397407e8cb2b89959a97ad1e8698899ba354c77c5cf3481ebf9d4a19",
+  "afterSha256": "4c6abce7397407e8cb2b89959a97ad1e8698899ba354c77c5cf3481ebf9d4a19",
+  "scope": "Three-block public RPC backfill and persisted-database restart in Envio. No complete deployment backfill, team provider, or live reorg claim."
+}

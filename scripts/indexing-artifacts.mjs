@@ -3,6 +3,7 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { launchOnBlockEventCatalog, listIndexingManifests } from "../dist/indexing.js";
+import { validateMaterializations, materializedSchema, materializedUpdates } from "./indexing-materializations.mjs";
 import { validateExamplePackageFiles } from "./example-lockfiles.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -25,12 +26,14 @@ if (mode !== "--write" && mode !== "--check") {
   throw new Error("usage: node scripts/indexing-artifacts.mjs --write|--check");
 }
 
+validateMaterializations(launchOnBlockEventCatalog);
 const manifests = listIndexingManifests();
 const publicCatalog = {
   schemaVersion: launchOnBlockEventCatalog.schemaVersion,
   coverage: launchOnBlockEventCatalog.coverage,
   abiRevision: launchOnBlockEventCatalog.abiRevision,
   contracts: launchOnBlockEventCatalog.contracts.map(({ eventAbi: _eventAbi, ...contract }) => contract),
+  materializations: launchOnBlockEventCatalog.materializations,
   networks: manifests,
 };
 
@@ -46,6 +49,9 @@ const artifacts = new Map([
   ["examples/graph/schema.graphql", graphSchema()],
 ]);
 
+for (const manifest of manifests) {
+  artifacts.set(`indexing/${manifest.chainId === 4663 ? "mainnet" : "testnet"}.json`, json({ $schema: "./manifest.schema.json", ...publicCatalog, networks: [manifest] }));
+}
 for (const contract of launchOnBlockEventCatalog.contracts) {
   artifacts.set(`indexing/${contract.abiFile}`, json(contract.eventAbi));
   artifacts.set(`examples/graph/src/${contract.name}.ts`, graphMapping(contract));
@@ -120,14 +126,15 @@ This directory is the stable, vendor-neutral indexing surface published with
 for third-party consumers; it is not an inventory of every implementation or administrative event.
 
 - \`manifest.json\`: chain identities, deployment boundaries, event topics, decoded parameters, value
-  semantics, and dynamic source discovery.
+  semantics, dynamic source discovery, and owner-declared materializations.
+- \`mainnet.json\` and \`testnet.json\`: the same catalog limited to one network.
 - \`manifest.schema.json\`: complete JSON Schema for validating the manifest.
 - \`abis/*.events.json\`: minimal event-only ABIs.
 
 Use chain ID, block hash/number, transaction hash/index, log index, and emitter address as event
 provenance. Handle reorgs and begin each fixed source at its declared start block. Dynamic sources begin
-at \`LaunchCreated.token\` and \`Graduated.pool\`; initial lifecycle state belongs to those discovery
-events because a newly registered source may not replay earlier logs from the same transaction.
+at \`LaunchCreated.token\` and \`Graduated.pool\`; the Envio starter registers at the discovery block and the live acceptance smoke verifies
+earlier transfers in the discovery transaction. Custom consumers must retain the same coverage.
 
 Amounts are raw integers. Their \`semantic\` labels identify units, but pricing, decimal normalization,
 valuation, attribution, confirmation policy, and storage design belong to the consumer.
@@ -174,6 +181,9 @@ name: launch-on-block-public-events
 description: Decoded Launch On Block public integration events.
 rollback_on_reorg: true
 raw_events: false
+handlers: ./src
+field_selection:
+  transaction_fields: [hash, transactionIndex]
 address_format: lowercase
 
 contracts:
@@ -185,7 +195,26 @@ ${chains}
 }
 
 function envioSchema() {
-  return `${entitySchema("envio")}\n`;
+  return `# Generated from the typed catalog. Fresh replay required when migrating the old per-event schema.
+${materializedSchema(launchOnBlockEventCatalog)}
+
+"""Canonical decoded events; rollback removes orphan rows with materialized entities."""
+type LobProtocolEvent {
+  id: ID!
+  chainId: BigInt! @index
+  contract: String! @index
+  kind: String! @index
+  signature: String!
+  emitter: String! @index
+  blockNumber: BigInt! @index
+  blockHash: String!
+  blockTimestamp: BigInt!
+  transactionHash: String! @index
+  transactionIndex: BigInt!
+  logIndex: BigInt!
+  payload: String!
+}
+`;
 }
 
 function envioTsconfig() {
@@ -207,12 +236,13 @@ function envioTsconfig() {
 
 function envioHandlers() {
   const handlers = launchOnBlockEventCatalog.contracts.flatMap((contract) => contract.events.map((event) => {
-    const entity = entityName(contract, event);
     return `indexer.onEvent({ contract: "${contract.name}", event: "${event.name}" }, async ({ event, context }) => {
-  context.${entity}.set({
+  context.LobProtocolEvent.set({
     ...metadata(event),
-${event.parameters.map((parameter) => `    ${parameter.name}: ${envioValue(parameter)},`).join("\n")}
+    contract: "${contract.name}", kind: "${event.name}", signature: "${event.signature}",
+    payload: JSON.stringify(event.params, (_, value) => typeof value === "bigint" ? value.toString() : value),
   });
+${materializedUpdates(launchOnBlockEventCatalog, contract, event)}
 });`;
   })).join("\n\n");
   const registrations = `indexer.contractRegister(
@@ -239,13 +269,13 @@ function metadata(event: {
   logIndex: number;
 }) {
   return {
-    id: \`${"${event.chainId}-${event.block.number}-${event.logIndex}"}\`,
+    id: \`${"${event.chainId}:${event.block.hash.toLowerCase()}:${event.logIndex}"}\`,
     chainId: BigInt(event.chainId),
-    emitter: event.srcAddress,
+    emitter: event.srcAddress.toLowerCase(),
     blockNumber: BigInt(event.block.number),
-    blockHash: event.block.hash,
+    blockHash: event.block.hash.toLowerCase(),
     blockTimestamp: BigInt(event.block.timestamp),
-    transactionHash: required(event.transaction.hash, "transaction.hash"),
+    transactionHash: required(event.transaction.hash, "transaction.hash").toLowerCase(),
     transactionIndex: BigInt(required(event.transaction.transactionIndex, "transaction.transactionIndex")),
     logIndex: BigInt(event.logIndex),
   };
@@ -429,6 +459,7 @@ function indexingManifestSchema() {
     properties: {
       contract: { const: "Launchpad" },
       event: { enum: ["LaunchCreated", "Graduated"] },
+      startFrom: { const: "discovery-block" },
       addressParameter: { enum: ["token", "pool"] },
     },
     additionalProperties: false,
@@ -440,6 +471,7 @@ function indexingManifestSchema() {
       contract: { const: "Launchpad" },
       event: { const: event },
       addressParameter: { const: addressParameter },
+      startFrom: { const: "discovery-block" },
     },
     additionalProperties: false,
   });
@@ -454,6 +486,20 @@ function indexingManifestSchema() {
       schemaVersion: { const: 1 },
       coverage: { const: "public_integration_events" },
       abiRevision: { type: "string", pattern: "^sha256:[0-9a-f]{64}$" },
+      materializations: { type: "array", minItems: 1, items: {
+        type: "object", required: ["name", "description", "key", "fields", "updates"],
+        properties: {
+          name: { type: "string" }, description: { type: "string" }, key: { const: "chainId:lowercase-address" },
+          fields: { type: "object", additionalProperties: { type: "object", required: ["type", "required"], properties: { type: { enum: ["String", "BigInt"] }, required: { type: "boolean" } }, additionalProperties: false } },
+          updates: { type: "array", items: { type: "object", required: ["contract", "event", "keyParameter", "set"], properties: {
+            contract: { type: "string" }, event: { type: "string" }, keyParameter: { type: "string" },
+            set: { type: "object", additionalProperties: { oneOf: [
+              { type: "object", required: ["parameter"], properties: { parameter: { type: "string" } }, additionalProperties: false },
+              { type: "object", required: ["blockNumber"], properties: { blockNumber: { const: true } }, additionalProperties: false },
+            ] } },
+          }, additionalProperties: false } },
+        }, additionalProperties: false,
+      } },
       contracts: {
         type: "array",
         minItems: 1,
@@ -486,6 +532,8 @@ function indexingManifestSchema() {
                         type: { type: "string", minLength: 1 },
                         indexed: { type: "boolean" },
                         semantic: { type: "string", minLength: 1 },
+                        asset: { type: "string", minLength: 1 },
+                        decimalsSource: { type: "string", minLength: 1 },
                       },
                       additionalProperties: false,
                     },
