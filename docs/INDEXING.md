@@ -14,7 +14,9 @@ administrative contract or dependency event. The generated Envio and The Graph
 starters are starting points. They have not been validated here by running a
 complete hosted backfill, restart, or live reorg. In particular, the current
 Envio starter has not yet adopted the shared SDK standard's normalized event
-log, owner-declared materialized entities, and pinned compilation requirements.
+log and owner-declared materialized entities. CI does compile the exact-pinned
+Envio and The Graph starters; that checks generated code, not live indexing.
+The standard's aggregate/release indexing-check wiring also remains pending.
 
 ## Sources and discovery
 
