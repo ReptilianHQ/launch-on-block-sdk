@@ -14,6 +14,13 @@ runtime-neutral arithmetic, documentation, and release safety.
 4. Run `npm ci` and `npm test`.
 5. Update `CHANGELOG.md` for consumer-visible changes.
 
+For consumer documentation, edit the prose and `examples/consumer/*.ts`, then run
+`npm run generate:docs` and `npm test`. Generated API signatures and example blocks should not be
+edited by hand. `check:docs` checks reference drift, error-code coverage, and repository links;
+the package check compiles the examples and README TypeScript snippets against an extracted tarball
+and executes the offline example. It never invokes the wallet submission example. Live quickstart
+checks remain separate, read-only provider checks; record their chain/block and outcome when run.
+
 Pull requests should explain the integration need, compatibility impact, tests, and provenance of any
 generated artifact. Public ABI or deployment changes must include reviewed compatibility evidence and
 must pass the immutable-artifact checks.

@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -143,6 +143,27 @@ try {
     encoding: "utf8",
   });
   if (extracted.status !== 0) throw new Error(`packed SDK extraction failed:\n${extracted.stderr || extracted.stdout}`);
+  // Compile a real consumer against only the extracted package's public exports, not src/ aliases.
+  const consumer = resolve(packDir, "consumer");
+  cpSync(resolve(root, "examples/consumer"), consumer, {
+    recursive: true, filter: (path) => path !== resolve(root, "examples/consumer/build"),
+  });
+  const readme = readFileSync(resolve(root, "README.md"), "utf8");
+  let snippetNumber = 0;
+  for (const [, snippet] of readme.matchAll(/```(?:ts|typescript)\n([\s\S]*?)```/g)) {
+    writeFileSync(resolve(consumer, `readme-${++snippetNumber}.ts`), snippet);
+  }
+  writeFileSync(resolve(consumer, "package.json"), '{"private":true,"type":"module"}\n');
+  mkdirSync(resolve(consumer, "node_modules/@reptilianhq"), { recursive: true });
+  symlinkSync(resolve(packDir, "package"), resolve(consumer, "node_modules/@reptilianhq/launch-on-block-sdk"), "dir");
+  for (const dependency of ["viem", "@types"]) {
+    symlinkSync(resolve(root, "node_modules", dependency), resolve(consumer, "node_modules", dependency), "dir");
+  }
+  // Runtime dependencies resolve from the extracted package as well as from consumer code.
+  symlinkSync(resolve(consumer, "node_modules"), resolve(packDir, "package/node_modules"), "dir");
+  runPackageTool("tsc", ["--project", resolve(consumer, "tsconfig.json")], "consumer example compilation");
+  const offline = spawnSync(process.execPath, [resolve(consumer, "build/offline.js")], { encoding: "utf8" });
+  if (offline.status !== 0) throw new Error(`offline consumer example failed:\n${offline.stderr || offline.stdout}`);
   const packagedDeployments = await import(
     `${pathToFileURL(resolve(packDir, "package/dist/deployments.js")).href}?integrity=${result.integrity}`
   );
@@ -161,7 +182,7 @@ try {
   runPackageTool("attw", [tarballPath, "--profile", "esm-only"], "Are The Types Wrong");
 
   console.log(
-    `packed ${result.name}@${result.version} with all ${exportFiles.length} export targets, internal verification artifacts, publint, and attw`,
+    `packed ${result.name}@${result.version} with all ${exportFiles.length} export targets, compiled consumer examples, offline execution, internal verification artifacts, publint, and attw`,
   );
 } finally {
   rmSync(packDir, { recursive: true, force: true });

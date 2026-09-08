@@ -94,7 +94,7 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "check": "npm run check:artifacts && npm run build && npm run check:public && npm run check:indexing && npm run check:conformance && npm run test:scripts && npm run test:unit && npm run test:pack",
+    "check": "npm run check:artifacts && npm run build && npm run check:public && npm run check:indexing && npm run check:conformance && npm run check:docs && npm run test:scripts && npm run test:unit && npm run test:pack",
     "check:artifacts": "node scripts/check-artifacts.mjs",
     "check:indexing": "node scripts/indexing-artifacts.mjs --check",
     "check:public": "node scripts/check-public-boundary.mjs",
@@ -106,7 +106,9 @@
     "test:scripts": "node --test scripts/*.node-test.mjs",
     "test:unit": "tsc -p tsconfig.test.json && vitest run",
     "test:pack": "node scripts/pack.mjs",
-    "verify:deployment": "npm run build && node scripts/verify-deployment.mjs"
+    "verify:deployment": "npm run build && node scripts/verify-deployment.mjs",
+    "check:docs": "node scripts/docs.mjs --check",
+    "generate:docs": "npm run build && node scripts/docs.mjs --write"
   },
   "peerDependencies": {
     "viem": ">=2.21.0 <3"

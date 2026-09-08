@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { getAddress, type Address, type Hex } from "viem";
 import { getDeployment, ROBINHOOD_CHAIN_ID } from "./deployments.js";
+import { getIndexingManifest } from "./indexing.js";
 import { SdkError } from "./errors.js";
 import {
   verifyBuyReceipt,
@@ -117,6 +118,7 @@ describe("pinned finalized Robinhood Chain receipts", () => {
     // A compatibility change (address, generation, or ABI revision) fails here until every
     // receipt is re-pinned against the new identity.
     expect(fixture.chainId).toBe(deployment.chainId);
+    expect(fixture.deploymentId).toBe(getIndexingManifest(deployment.chainId).deploymentId);
     expect(fixture.generation).toBe(deployment.contracts.generation);
     expect(fixture.abiRevision).toBe(deployment.contracts.abiRevision);
   });

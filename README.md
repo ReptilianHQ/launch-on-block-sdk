@@ -16,7 +16,7 @@ authorization model.
 - Narrow, generated ABI subsets with literal `as const` types.
 - Typed, chain-scoped deployment metadata and replay boundaries.
 - Transaction builders and calldata verification.
-- Receipt verification tied to the expected contract and transaction envelope.
+- Receipt event verification against the expected emitter and supplied fields.
 - Deployment compatibility checks for runtime bytecode, proxies, and cross-contract wiring.
 - A machine-readable public event catalog with neutral assets and runnable Graph and Envio examples.
 - Stable SDK error codes and deterministic protocol arithmetic.
@@ -49,7 +49,7 @@ chain evidence are excluded from declarations and the npm runtime artifact.
 
 The raw launch-escrow ABI remains internal. Consumers that need protocol reconciliation can use
 `readLaunchEscrowState()` from the `./escrows` export. It reads one numbered safe block, verifies the
-Launchpad mapping, deterministic deployer prediction, deployed bytecode, launchpad pointer, and token
+Launchpad mapping, deterministic deployer prediction, non-empty bytecode, launchpad pointer, and token
 pointer, then returns raw `backing`. That value is protocol accounting data—not liquidity, TVL, price,
 redeemable value, or wallet value.
 
@@ -88,142 +88,38 @@ the coverage marker and ABI revision with their integration evidence. See
 
 ## Installation
 
-Install the public package from npm:
+Requires Node.js 22 or newer and `viem >=2.21.0 <3`. Install the public package from npm:
 
 ```sh
-npm install @reptilianhq/launch-on-block-sdk viem
+npm install @reptilianhq/launch-on-block-sdk 'viem@^2.21.0'
 ```
 
 Releases use npm trusted publishing with provenance from the public GitHub repository and protected
 release environment. See [`docs/RELEASING.md`](docs/RELEASING.md).
 
-## Usage
+## Start here
 
-Import ABIs from narrow package subpaths so TypeScript preserves their literal types:
+Follow the [complete quickstart](https://github.com/ReptilianHQ/launch-on-block-sdk/blob/main/docs/QUICKSTART.md)
+to create a client, verify the testnet deployment, and read fee terms without a wallet.
+It includes a separately callable wallet-buy example that simulates, estimates gas, submits, and
+verifies the mined transaction and receipt. Every variable and import is defined, and CI compiles
+these examples against the packed SDK. Offline examples run during package validation.
 
-```ts
-import { launchpadAbi, launchTokenAbi } from "@reptilianhq/launch-on-block-sdk/abis";
-```
+The [API reference](https://github.com/ReptilianHQ/launch-on-block-sdk/blob/main/docs/API_REFERENCE.md)
+covers every module, export, parameter/result type, error code, and verification boundary. Its
+exact signatures and export inventory are generated from the built declarations and checked for drift.
 
-Build and verify transactions without binding the SDK to a wallet implementation:
+Builders return `{ to, data, value }`. Consumers own quotes, wallet selection, simulation, gas,
+submission, confirmation depth, and reorg policy. Transaction verifiers compare sender, target,
+native value, and calldata. Receipt verifiers independently check successful status, emitter,
+and supplied event fields. They do not verify a transaction envelope or automatically link two
+observations; the wallet example demonstrates that association explicitly.
 
-```ts
-import {
-  buildCurveBuyTransaction,
-  getDeployment,
-  verifyBuyReceipt,
-} from "@reptilianhq/launch-on-block-sdk";
-
-const deployment = getDeployment(4663);
-const request = buildCurveBuyTransaction(deployment.contracts.launchpad, {
-  token,
-  minTokensOut,
-  value,
-});
-
-const hash = await walletClient.sendTransaction(request);
-const receipt = await publicClient.waitForTransactionReceipt({ hash });
-const buy = verifyBuyReceipt(receipt, deployment.contracts.launchpad, { token });
-```
-
-Builders return `{ to, data, value }`. Consumers remain responsible for wallet selection, simulation,
-gas estimation, submission, confirmation depth, and reorg policy.
-
-Predict and mine a vanity launch address without RPC calls, then pass the frozen salt to the standard
-transaction builder:
-
-```ts
-import {
-  buildCreateLaunchTransaction,
-  mineLaunchTokenVanitySalt,
-} from "@reptilianhq/launch-on-block-sdk";
-
-const vanity = mineLaunchTokenVanitySalt({
-  launchpad,
-  creator,
-  name: "Block Gecko",
-  symbol: "BLK",
-  metadataUri,
-  suffix: "b10c",
-  maxAttempts: 250_000,
-});
-if (!vanity) throw new Error("Continue the search from the next salt range");
-
-const request = buildCreateLaunchTransaction(launchpad, {
-  name: "Block Gecko",
-  symbol: "BLK",
-  creatorBps,
-  curveFeeBps,
-  payoutWallet,
-  metadataUri,
-  salt: vanity.salt,
-});
-```
-
-The miner is deterministic CPU work; browser applications should run it in a Web Worker. The predicted
-address is valid only for the exact Launchpad, creator, name, symbol, metadata URI, and salt.
-
-Before enabling writes, prove that the selected RPC serves the deployment described by the SDK:
-
-```ts
-import { assertCompatibleDeployment } from "@reptilianhq/launch-on-block-sdk/compatibility";
-import { robinhoodMainnet } from "@reptilianhq/launch-on-block-sdk/deployments";
-
-await assertCompatibleDeployment(publicClient, robinhoodMainnet);
-```
-
-Compatibility checks prove deployment identity and wiring. They do not prove current operational health,
-pause state, balances, finality, or external governance safety.
-
-Both `assertCompatibleDeployment` and `readLaunchEscrowState` select one numbered `safe` block by
-default. The RPC must retain code, storage, and contract state at that height. During the September 8,
-2026 audit, the canonical RPCs served sampled state at `latest - 6000` but failed at `latest - 7000`;
-mainnet's safe block sometimes fell outside the available window. These are observations, not a fixed
-retention guarantee. An error such as `metadata is not found` means verification did not complete.
-Use an RPC that serves the required state or retry later. Neither SDK helper retries automatically.
-
-Callers can supply a block selected by their own confirmation policy. For example, to pin both reads
-to the same safe block:
-
-```ts
-import { readLaunchEscrowState } from "@reptilianhq/launch-on-block-sdk/escrows";
-
-const safeBlock = await publicClient.getBlock({ blockTag: "safe" });
-if (safeBlock.number === null) throw new Error("RPC did not return a numbered safe block");
-const options = { blockNumber: safeBlock.number };
-await assertCompatibleDeployment(publicClient, robinhoodMainnet, options);
-const state = await readLaunchEscrowState(publicClient, robinhoodMainnet, token, options);
-```
-
-An explicit block does not make unavailable state readable. Selecting a more recent block can change
-the confirmation guarantee; the SDK does not silently substitute `latest` or `latest - N`.
-
-Read a launch escrow for reconciliation without importing its raw ABI:
-
-```ts
-import { readLaunchEscrowState } from "@reptilianhq/launch-on-block-sdk/escrows";
-import { robinhoodMainnet } from "@reptilianhq/launch-on-block-sdk/deployments";
-
-const escrow = await readLaunchEscrowState(publicClient, robinhoodMainnet, token);
-if (escrow.status === "deployed") {
-  console.log(escrow.backing); // Raw accounting value; do not present as TVL or price.
-}
-```
-
-SDK validation errors expose stable codes:
-
-```ts
-import { isSdkError } from "@reptilianhq/launch-on-block-sdk/errors";
-
-try {
-  verifyCurveBuyTransaction(transaction, launchpad, account, expectedBuy);
-} catch (error) {
-  if (isSdkError(error) && error.code === "CALLDATA_MISMATCH") {
-    // Map application behavior by code; messages may evolve.
-  }
-  throw error;
-}
-```
+Compatibility and escrow reads default to one numbered `safe` block. An RPC may retain less
+historical state than its safe lag requires; `metadata is not found` is an incomplete verification,
+not a passed check. Use a provider serving the required state or retry later. Both helpers accept
+`options.blockNumber` under the caller's confirmation policy. They do not silently fall back to
+`latest`, and a recent block is not necessarily safe/finalized.
 
 ## Development
 
@@ -243,8 +139,9 @@ complete and never switches to a recent block. Identity mismatches fail immediat
 See [release verification](https://github.com/ReptilianHQ/launch-on-block-sdk/blob/main/docs/RELEASING.md#live-deployment-verification)
 for troubleshooting.
 
-`npm test` verifies the reviewed artifact hashes, builds the package, runs the unit suite, and packs the
-exact public exports from a clean `dist` directory. The resulting tarball must pass strict `publint` and
+`npm test` verifies immutable artifacts and corrected metadata, builds the package, checks public
+boundaries/indexing/conformance/docs, runs script and unit suites, and validates the packed exports.
+The package check compiles consumer examples against the extracted tarball and runs the offline example. The resulting tarball must pass strict `publint` and
 Are The Types Wrong checks for the SDK's supported ESM resolution modes. CI also audits GitHub Actions
 and Dependabot configuration with a pinned `zizmor` action and scanner release. `npm run generate:indexing`
 regenerates every committed indexing artifact from the built SDK catalog; normal checks fail on any drift.
@@ -256,19 +153,21 @@ acceptance with evidence equality, per-field rejection classified by error code,
 monotonicity properties for the economic math. `fixtures/robinhood-mainnet.json` pins one finalized
 mainnet receipt per `verify*Receipt` function, replayed in `src/receipts.test.ts` — the property
 suites prove the rejection logic, the pinned receipts prove the encoding against a transaction that
-really happened. See
-[`docs/SDK_STANDARDS.md`](https://github.com/ReptilianHQ/reptilian/blob/main/docs/SDK_STANDARDS.md) in
-the `reptilian` repository for the shared standard this package is held to and its dated conformance
-table. `scripts/check-conformance.mjs` is an emitted copy of that repository's conformance script:
-its header records the sha256 of the rule body, `npm run test:scripts` fails if the body no longer
-matches it, and the source repository checks this copy against the canonical rules on every change
-and weekly. Re-emit it from the source rather than editing it here.
+really happened. The public conformance implementation is
+[`scripts/check-conformance.mjs`](https://github.com/ReptilianHQ/launch-on-block-sdk/blob/main/scripts/check-conformance.mjs).
+Its header pins the rule-body hash and `test:scripts` detects edits. These checked-in rules and the
+[API reference](https://github.com/ReptilianHQ/launch-on-block-sdk/blob/main/docs/API_REFERENCE.md)
+are publicly accessible; consumers do not need access to the private standards repository.
+
+For documentation changes, edit the guides and `examples/consumer/*.ts`, then run
+`npm run generate:docs` and `npm test`. `npm run check:docs` detects stale generated signatures and
+example snippets. It runs after the build in the normal check chain.
 
 Do not import Foundry artifact JSON or copy ABI fragments into consumer applications. Foundry artifacts
 contain broad deployment data that application bundles do not need, while copied fragments drift
 independently from the SDK's compatibility checks. The narrow reviewed LaunchToken init code used by
 the vanity helper is intentionally pinned inside the SDK because CREATE2 prediction includes that exact
-bytecode; its regression vector is checked against the production Launchpad.
+bytecode; its regression test compares against a pinned production vector offline, without a live RPC call.
 
 Contributions are welcome through focused issues and pull requests. See [`CONTRIBUTING.md`](CONTRIBUTING.md)
 for the public boundary, verification commands, and security-reporting expectations.

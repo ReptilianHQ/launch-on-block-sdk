@@ -10,6 +10,14 @@ metadata use by an evidence-bound [correction record](DEPLOYMENT_METADATA.md), c
 without rewriting the immutable producer artifact. The findings below describe the original audited
 revision; published deployment identities remain unchanged.
 
+**Consumer documentation follow-up:** F-04/F-05/F-06/F-07/F-09 are corrected in the README;
+F-08's fixture field now holds the canonical deployment ID and is regression-checked. The
+[quickstart](QUICKSTART.md) and [API reference](API_REFERENCE.md) cover dependencies, all current
+exports/types/error codes, verification boundaries, and complete examples. `check:docs` detects
+reference/snippet drift; package validation compiles examples against the extracted tarball.
+F-10 remains an explicitly unverified full backfill scenario, not a claimed endpoint failure.
+The historical observations and original inventory below have not been rewritten as new evidence.
+
 ## Verdict
 
 **Original audit verdict: mostly accurate, subject to the missing evidence described above.** All 26 contract addresses, all 26 runtime code hashes, both chain ids, both start blocks, the EIP-1967 proxy wiring, release id `gen-12`, the ABI revision, all 5 pinned mainnet transactions, all 8 `verify*Receipt` evidence objects, the CREATE2 vanity init code, the fee/curve constants, the `exports` map, the license history and the npm withdrawal history were reported to match source, the npm registry, GitHub tags, and live chain state. `npm test` is green (84 unit + scripts + pack); `assertCompatibleDeployment` was reported to pass on both chains when state was available. The follow-up reproduced the default-safe mainnet failure; see the attached evidence.
