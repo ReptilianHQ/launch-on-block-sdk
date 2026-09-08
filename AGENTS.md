@@ -17,6 +17,9 @@ Keep the SDK runtime-neutral:
   compatibility evidence;
 - treat the initial generated ABI and deployment files as immutable reviewed inputs, verified by
   `npm run check:artifacts`;
+- use `provenance/deployment-metadata.json` for corrected internal deployment identity/timelock
+  metadata; keep its source/evidence bindings and both-network consistency checks intact (see
+  `docs/DEPLOYMENT_METADATA.md`), without rewriting the immutable producer inputs;
 - expose deployment metadata through the reviewed public projection only; operational controls and
   release-authority fields must not enter declarations or the npm runtime artifact;
 - run `npm test` before shipping.

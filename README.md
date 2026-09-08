@@ -38,7 +38,12 @@ proxy upgrade gate. Those interfaces are committed in the generated artifact and
 because `assertCompatibleDeployment()` uses them internally, but they are not public package exports.
 Consumers should call the compatibility helper instead of rebuilding governance and proxy checks.
 
-The immutable generated deployment input preserves reviewed provenance. The package exports only a
+The immutable generated deployment input preserves historical producer provenance. Its internal testnet
+`chain_data` and timelock fields contain known stale values; repository tooling uses the evidence-bound
+correction record in [`provenance/deployment-metadata.json`](https://github.com/ReptilianHQ/launch-on-block-sdk/blob/main/provenance/deployment-metadata.json).
+`npm run check:artifacts` preserves the original hashes and checks corrected identities on both chains.
+See the [metadata correction policy](https://github.com/ReptilianHQ/launch-on-block-sdk/blob/main/docs/DEPLOYMENT_METADATA.md).
+The package exports only a
 typed public projection; operational controls, release authorities, deployer identity, and private
 chain evidence are excluded from declarations and the npm runtime artifact.
 
@@ -170,6 +175,29 @@ await assertCompatibleDeployment(publicClient, robinhoodMainnet);
 Compatibility checks prove deployment identity and wiring. They do not prove current operational health,
 pause state, balances, finality, or external governance safety.
 
+Both `assertCompatibleDeployment` and `readLaunchEscrowState` select one numbered `safe` block by
+default. The RPC must retain code, storage, and contract state at that height. During the September 8,
+2026 audit, the canonical RPCs served sampled state at `latest - 6000` but failed at `latest - 7000`;
+mainnet's safe block sometimes fell outside the available window. These are observations, not a fixed
+retention guarantee. An error such as `metadata is not found` means verification did not complete.
+Use an RPC that serves the required state or retry later. Neither SDK helper retries automatically.
+
+Callers can supply a block selected by their own confirmation policy. For example, to pin both reads
+to the same safe block:
+
+```ts
+import { readLaunchEscrowState } from "@reptilianhq/launch-on-block-sdk/escrows";
+
+const safeBlock = await publicClient.getBlock({ blockTag: "safe" });
+if (safeBlock.number === null) throw new Error("RPC did not return a numbered safe block");
+const options = { blockNumber: safeBlock.number };
+await assertCompatibleDeployment(publicClient, robinhoodMainnet, options);
+const state = await readLaunchEscrowState(publicClient, robinhoodMainnet, token, options);
+```
+
+An explicit block does not make unavailable state readable. Selecting a more recent block can change
+the confirmation guarantee; the SDK does not silently substitute `latest` or `latest - N`.
+
 Read a launch escrow for reconciliation without importing its raw ABI:
 
 ```ts
@@ -206,6 +234,14 @@ with npm and the committed lockfile.
 npm ci
 npm test
 ```
+
+For a live safe-block compatibility check, run `npm run verify:deployment` (mainnet by default), or
+`SDK_RELEASE_CHAIN_ID=46630 npm run verify:deployment` for testnet. `VERIFY_RPC` selects an alternate
+endpoint. The command retries recognized unavailable-state errors up to three total attempts, two
+seconds apart, selecting a safe block on each attempt. It exits nonzero if verification still cannot
+complete and never switches to a recent block. Identity mismatches fail immediately.
+See [release verification](https://github.com/ReptilianHQ/launch-on-block-sdk/blob/main/docs/RELEASING.md#live-deployment-verification)
+for troubleshooting.
 
 `npm test` verifies the reviewed artifact hashes, builds the package, runs the unit suite, and packs the
 exact public exports from a clean `dist` directory. The resulting tarball must pass strict `publint` and

@@ -4,6 +4,12 @@
 **Change policy:** audit documentation and read-only reproduction evidence only. No SDK runtime, deployment input, release gate, or package exports changed.
 **Original author-reported method:** a 125-claim ledger and 269 JSON-RPC calls. That original ledger, log, and probe bundle were not attached to this PR. Original live-chain observations, counts, and coverage totals below are author-reported, not independently verified by the report itself. The attached follow-up probe and evidence cover only the explicitly listed checks; they do not reconstruct the missing original bundle.
 
+**Follow-up remediation:** F-01 now has documented block selection, bounded safe-only retries in the
+verification command, and an actionable provider-state failure. F-02/F-03 are superseded for repository
+metadata use by an evidence-bound [correction record](DEPLOYMENT_METADATA.md), checked for both networks
+without rewriting the immutable producer artifact. The findings below describe the original audited
+revision; published deployment identities remain unchanged.
+
 ## Verdict
 
 **Original audit verdict: mostly accurate, subject to the missing evidence described above.** All 26 contract addresses, all 26 runtime code hashes, both chain ids, both start blocks, the EIP-1967 proxy wiring, release id `gen-12`, the ABI revision, all 5 pinned mainnet transactions, all 8 `verify*Receipt` evidence objects, the CREATE2 vanity init code, the fee/curve constants, the `exports` map, the license history and the npm withdrawal history were reported to match source, the npm registry, GitHub tags, and live chain state. `npm test` is green (84 unit + scripts + pack); `assertCompatibleDeployment` was reported to pass on both chains when state was available. The follow-up reproduced the default-safe mainnet failure; see the attached evidence.
