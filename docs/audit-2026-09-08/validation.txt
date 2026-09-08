@@ -1,0 +1,72 @@
+
+> @reptilianhq/launch-on-block-sdk@0.9.0 test
+> npm run check
+
+
+> @reptilianhq/launch-on-block-sdk@0.9.0 check
+> npm run check:artifacts && npm run build && npm run check:public && npm run check:indexing && npm run check:conformance && npm run test:scripts && npm run test:unit && npm run test:pack
+
+
+> @reptilianhq/launch-on-block-sdk@0.9.0 check:artifacts
+> node scripts/check-artifacts.mjs
+
+verified 2 generated artifacts for launch-on-block-contracts/gen-12
+
+> @reptilianhq/launch-on-block-sdk@0.9.0 build
+> npm run clean && tsc -p tsconfig.json && node scripts/sanitize-built-deployments.mjs && node scripts/generate-provenance.mjs
+
+
+> @reptilianhq/launch-on-block-sdk@0.9.0 clean
+> rm -rf dist
+
+
+> @reptilianhq/launch-on-block-sdk@0.9.0 check:public
+> node scripts/check-public-boundary.mjs
+
+verified the public package boundary and 12 self-contained source maps
+
+> @reptilianhq/launch-on-block-sdk@0.9.0 check:indexing
+> node scripts/indexing-artifacts.mjs --check
+
+verified 21 indexing artifacts
+
+> @reptilianhq/launch-on-block-sdk@0.9.0 check:conformance
+> node scripts/check-conformance.mjs .
+
+SDK conformance passed for .
+
+> @reptilianhq/launch-on-block-sdk@0.9.0 test:scripts
+> node --test scripts/*.node-test.mjs
+
+✔ the vendored conformance script body matches the hash recorded in its header (0.56025ms)
+✔ the vendored conformance script still exposes the rule set the check script invokes (0.445125ms)
+✔ accepts a lockfile whose root mirrors the manifest (1.457375ms)
+✔ rejects a missing root package (0.16325ms)
+✔ rejects stale dependency metadata (0.07675ms)
+✔ rejects a missing lockfile on disk (0.472208ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 35.172709
+
+> @reptilianhq/launch-on-block-sdk@0.9.0 test:unit
+> tsc -p tsconfig.test.json && vitest run
+
+
+ RUN  v4.1.10 /private/tmp/launch-on-block-sdk-pr24
+
+
+ Test Files  10 passed (10)
+      Tests  84 passed (84)
+   Start at  12:33:45
+   Duration  1.83s (transform 561ms, setup 0ms, import 2.15s, tests 2.80s, environment 0ms)
+
+
+> @reptilianhq/launch-on-block-sdk@0.9.0 test:pack
+> node scripts/pack.mjs
+
+packed @reptilianhq/launch-on-block-sdk@0.9.0 with all 31 export targets, internal verification artifacts, publint, and attw
