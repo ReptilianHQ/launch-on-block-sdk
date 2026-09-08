@@ -13,7 +13,7 @@ function sourceFiles(dir) {
   return readdirSync(join(root, dir), { withFileTypes: true }).flatMap(entry => entry.isDirectory() ? sourceFiles(`${dir}/${entry.name}`) : [`${dir}/${entry.name}`]);
 }
 function inputs() {
-  return Object.fromEntries([...sourceFiles('src'), 'scripts/fork.mjs', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.test.json'].sort().map(path => [path, createHash('sha256').update(readFileSync(join(root, path))).digest('hex')]));
+  return Object.fromEntries([...sourceFiles('src'), ...sourceFiles('scripts'), '.github/workflows/publish.yml', 'package.json', 'package-lock.json', 'tsconfig.json', 'tsconfig.test.json'].sort().map(path => [path, createHash('sha256').update(readFileSync(join(root, path))).digest('hex')]));
 }
 const version = JSON.parse(readFileSync(join(root, 'package.json'))).version;
 if (args.includes('--check-evidence')) {
@@ -26,12 +26,14 @@ if (args.includes('--check-evidence')) {
 } else {
   const temp = mkdtempSync(join(tmpdir(), 'lob-fork-'));
   try {
+    const verifiedInputs = inputs();
     const reportPath = join(temp, 'report.json');
     const result = spawnSync(process.execPath, [resolve(root, 'node_modules/vitest/vitest.mjs'), 'run', 'src/transactions.fork.test.ts', '--reporter=json', `--outputFile=${reportPath}`], { cwd: root, env: process.env, stdio: 'inherit', timeout: 600_000 });
     if (result.error || result.status !== 0) throw new TypeError('Pinned fork verification failed; no release evidence written.', { cause: result.error });
     const report = JSON.parse(readFileSync(reportPath));
     if (!report.success || report.numPassedTests !== 3 || report.numPendingTests !== 0) throw new TypeError('Expected all three fork suites to execute without skips.');
-    const evidence = { schemaVersion: 1, status: 'PASS', version, recordedAt: new Date().toISOString(), passedTests: report.numPassedTests, scope: 'Pinned local EVM fork execution; no production submission, finality or reorg proof. RPC endpoint omitted.', inputs: inputs() };
+    if (JSON.stringify(verifiedInputs) !== JSON.stringify(inputs())) throw new TypeError('SDK inputs changed during fork execution; rerun against a stable source tree.');
+    const evidence = { schemaVersion: 1, status: 'PASS', version, recordedAt: new Date().toISOString(), passedTests: report.numPassedTests, scope: 'Pinned local EVM fork execution; no production submission, finality or reorg proof. RPC endpoint omitted.', inputs: verifiedInputs };
     writeFileSync(evidencePath, JSON.stringify(evidence, null, 2) + '\n');
     console.log(`PASS: recorded source-bound fork evidence for SDK ${version}.`);
   } finally { rmSync(temp, { recursive: true, force: true }); }

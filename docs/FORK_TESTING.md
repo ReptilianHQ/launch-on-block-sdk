@@ -49,7 +49,7 @@ vanity creation overloads and claim execution are not covered by this fork suite
 existing construction properties cover their SDK transaction encoding.
 
 `docs/fork-evidence.json` records the successful non-skipped run and hashes every
-SDK source file, the runner, package/lockfile and TypeScript configuration. Any
+SDK source file, build/test scripts, publish workflow, package/lockfile and TypeScript configuration. Any
 change to those inputs requires fresh evidence before publication. Run these
 suites on every release and compatibility change. Fork results prove neither
 production signing, mempool behavior, finality nor reorg recovery.
