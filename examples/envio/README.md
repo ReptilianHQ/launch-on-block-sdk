@@ -2,7 +2,7 @@
 
 This generated starter stores a canonical `LobProtocolEvent` log plus `LobLaunch`
 and `LobPool` identity/terms read models. Edit the SDK catalog and regenerate,
-not the generated schema or handlers. Event payload integers are decimal strings.
+not the generated schema or handlers. BigInt payload values are decimal strings; safe small integers remain JSON numbers.
 Envio rolls back orphan log rows and materialized records together.
 
 1. Copy this directory together with the repository's `indexing/` directory, preserving their relative
