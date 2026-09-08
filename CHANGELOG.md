@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.10.0 — 2026-09-08
+
+- Prove SDK transaction and receipt behavior on a pinned Robinhood fork before publication.
 
 - Generate canonical indexing logs and identity records with tested Envio startup and durable restart.
 - Enforce indexing conformance, starter compilation, and generated artifact drift before release.

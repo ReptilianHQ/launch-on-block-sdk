@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "workflows": [
+    {
+      "id": "sdk-release",
+      "risk": "public-package-publication",
+      "runbook": "docs/RELEASING.md",
+      "files": ["src/", "scripts/fork.mjs", "package.json", "package-lock.json", ".github/workflows/publish.yml"],
+      "verification": {
+        "static": { "command": "npm test && npm run check:fork-evidence", "evidence": "docs/fork-evidence.json" },
+        "local": { "command": "npm run test:fork -- --required", "requiresEnv": ["SDK_FORK_EIP155_4663_RPC_URL"], "runbook": "docs/FORK_TESTING.md", "proves": ["Reviewed deployment identity at the exact fork block", "Generated quote and execution agreement through SDK receipt verifiers", "Graduation and collected fee conservation"] },
+        "manual": { "boundary": "Protected GitHub npm environment approval, followed by registry integrity and provenance verification" }
+      }
+    }
+  ]
+}

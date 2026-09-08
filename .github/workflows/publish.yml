@@ -40,6 +40,7 @@ jobs:
           test "$(git rev-parse "$RELEASE_TAG^{commit}")" = "$GITHUB_SHA"
           node -e 'const packageJson = require("./package.json"); const tag = `v${packageJson.version}`; if (process.env.RELEASE_TAG !== tag) throw new Error(`expected release tag ${tag}`); if (packageJson.version.includes("-") !== (process.env.RELEASE_PRERELEASE === "true")) throw new Error("release prerelease state does not match package version");'
       - run: npm ci
+      - run: npm run check:fork-evidence
       - run: npm test
       - name: Publish through npm trusted publishing
         env:

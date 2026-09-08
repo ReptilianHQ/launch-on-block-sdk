@@ -12,18 +12,23 @@ tokenless publication with npm provenance. No npm token belongs in GitHub Action
 The protected `npm` environment requires human approval. The publishing workflow additionally proves
 that the release tag, package version, release commit, public repository, and prerelease state agree.
 
+The release workflow is registered in [workflows/registry.json](../workflows/registry.json).
+
 ## Normal release
 
 1. Update `CHANGELOG.md`, `package.json`, and `package-lock.json` to the same version.
 2. Run `npm ci && npm test` on Node 24; CI repeats the suite on Node 22 and 24.
    The suite checks generated documentation and compiles consumer examples against the extracted
    tarball. If a public signature or example changes, run `npm run generate:docs` before testing.
-3. Merge to `main`, create an exact `v<version>` tag, and publish a matching GitHub Release. Mark it as a
+3. Run the [pinned fork suites](FORK_TESTING.md) with `npm run test:fork -- --required`.
+   Commit `docs/fork-evidence.json`; publishing checks its exact source and version hashes offline.
+   Missing RPC, skipped suites, failed execution, or stale evidence cannot authorize publication.
+4. Merge to `main`, create an exact `v<version>` tag, and publish a matching GitHub Release. Mark it as a
    prerelease exactly when the semver contains a prerelease component.
-4. `.github/workflows/publish.yml` verifies the tag and release identity, rebuilds and tests the package,
+5. `.github/workflows/publish.yml` verifies the tag and release identity, rebuilds and tests the package,
    then publishes through npm OIDC with provenance.
 
-5. Wait for the verify job to reproduce the tarball and match its integrity to the npm registry.
+6. Wait for the verify job to reproduce the tarball and match its integrity to the npm registry.
 
 The `npm` GitHub environment remains the human approval boundary for every publication.
 
