@@ -4,3 +4,6 @@ examples/envio/.envio/
 examples/envio/envio-env.d.ts
 examples/graph/build/
 examples/graph/generated/
+
+# Compiled consumer examples
+examples/consumer/build/

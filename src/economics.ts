@@ -62,8 +62,8 @@ export function validateFeeRange(
 }
 
 /**
- * Validates the Router's exact expiry rule against a caller-supplied timestamp.
- * A deadline equal to the current timestamp remains valid on-chain.
+ * Validates deadline >= currentTimestamp using caller-supplied integer timestamps.
+ * Equality passes this local check; it does not guarantee later on-chain acceptance.
  */
 export function validateDeadline(deadline: bigint, currentTimestamp: bigint): bigint {
   assertUint256(deadline, "deadline");

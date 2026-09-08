@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Consumer documentation
+
+- Add complete consumer examples and an API reference checked against the packed SDK.
+- Clarify verification guarantees, supported dependencies, and receipt fixture identity.
+
 ### 2026-09-08
 
 - Preserve safe-block verification with bounded retries and actionable RPC availability guidance.

@@ -16,6 +16,8 @@ that the release tag, package version, release commit, public repository, and pr
 
 1. Update `CHANGELOG.md`, `package.json`, and `package-lock.json` to the same version.
 2. Run `npm ci && npm test` on Node 24; CI repeats the suite on Node 22 and 24.
+   The suite checks generated documentation and compiles consumer examples against the extracted
+   tarball. If a public signature or example changes, run `npm run generate:docs` before testing.
 3. Merge to `main`, create an exact `v<version>` tag, and publish a matching GitHub Release. Mark it as a
    prerelease exactly when the semver contains a prerelease component.
 4. `.github/workflows/publish.yml` verifies the tag and release identity, rebuilds and tests the package,
