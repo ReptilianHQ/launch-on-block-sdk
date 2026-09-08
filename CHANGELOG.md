@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### 2026-09-08
+
+- Document deployment audit findings with reproducible public RPC evidence and explicit verification limits.
+
 - Carry the shared conformance script as an emitted, hash-headed copy checked against its body
   by `test:scripts`, so a local edit cannot silently change what the package is held to.
 
