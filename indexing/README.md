@@ -5,14 +5,15 @@ This directory is the stable, vendor-neutral indexing surface published with
 for third-party consumers; it is not an inventory of every implementation or administrative event.
 
 - `manifest.json`: chain identities, deployment boundaries, event topics, decoded parameters, value
-  semantics, and dynamic source discovery.
+  semantics, dynamic source discovery, and owner-declared materializations.
+- `mainnet.json` and `testnet.json`: the same catalog limited to one network.
 - `manifest.schema.json`: complete JSON Schema for validating the manifest.
 - `abis/*.events.json`: minimal event-only ABIs.
 
 Use chain ID, block hash/number, transaction hash/index, log index, and emitter address as event
 provenance. Handle reorgs and begin each fixed source at its declared start block. Dynamic sources begin
-at `LaunchCreated.token` and `Graduated.pool`; initial lifecycle state belongs to those discovery
-events because a newly registered source may not replay earlier logs from the same transaction.
+at `LaunchCreated.token` and `Graduated.pool`; the Envio starter registers at the discovery block and the live acceptance smoke verifies
+earlier transfers in the discovery transaction. Custom consumers must retain the same coverage.
 
 Amounts are raw integers. Their `semantic` labels identify units, but pricing, decimal normalization,
 valuation, attribution, confirmation policy, and storage design belong to the consumer.

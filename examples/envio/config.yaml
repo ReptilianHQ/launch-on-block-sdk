@@ -4,6 +4,9 @@ name: launch-on-block-public-events
 description: Decoded Launch On Block public integration events.
 rollback_on_reorg: true
 raw_events: false
+handlers: ./src
+field_selection:
+  transaction_fields: [hash, transactionIndex]
 address_format: lowercase
 
 contracts:

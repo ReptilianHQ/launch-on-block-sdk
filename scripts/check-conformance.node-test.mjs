@@ -12,9 +12,10 @@ import test from "node:test";
 
 const SHEBANG = "#!/usr/bin/env node\n";
 const HEADER_MARKER = "// Canonical body sha256:";
-const source = readFileSync(new URL("./check-conformance.mjs", import.meta.url), "utf8");
+for (const file of ["./check-conformance.mjs", "./check-indexing-conformance.mjs"]) {
+const source = readFileSync(new URL(file, import.meta.url), "utf8");
 
-test("the vendored conformance script body matches the hash recorded in its header", () => {
+test(`${file} body matches the hash recorded in its header`, () => {
   assert.ok(source.startsWith(SHEBANG), "vendored script must keep its shebang");
   const lines = source.slice(SHEBANG.length).replace(/^\n+/u, "").split("\n");
   const markerIndex = lines.findIndex((line) => line.startsWith(HEADER_MARKER));
@@ -24,6 +25,8 @@ test("the vendored conformance script body matches the hash recorded in its head
   assert.match(recorded, /^[0-9a-f]{64}$/u);
   assert.equal(createHash("sha256").update(body).digest("hex"), recorded, "body edited without re-emitting from the source");
 });
+
+}
 
 test("the vendored conformance script still exposes the rule set the check script invokes", async () => {
   const module = await import("./check-conformance.mjs");

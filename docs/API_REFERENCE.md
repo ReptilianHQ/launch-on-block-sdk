@@ -222,6 +222,8 @@ Import the package root for all named exports, or a narrow module below. JSON en
 | `./indexing/abis/GraduationPool.events.json` | `./indexing/abis/GraduationPool.events.json` |
 | `./provenance/mainnet.json` | `./dist/provenance/mainnet.json` |
 | `./provenance/testnet.json` | `./dist/provenance/testnet.json` |
+| `./indexing/mainnet.json` | `./indexing/mainnet.json` |
+| `./indexing/testnet.json` | `./indexing/testnet.json` |
 
 ## ./abis
 
@@ -820,6 +822,8 @@ export interface IndexingEventParameter {
     type: string;
     indexed: boolean;
     semantic: string;
+    asset?: string;
+    decimalsSource?: string;
 }
 export interface IndexingEventDefinition {
     name: string;
@@ -836,6 +840,7 @@ export interface IndexingContractDefinition {
         contract: "Launchpad";
         event: "LaunchCreated" | "Graduated";
         addressParameter: "token" | "pool";
+        startFrom: "discovery-block";
     };
     eventAbi: readonly AbiEvent[];
     events: readonly IndexingEventDefinition[];
@@ -859,10 +864,30 @@ export interface IndexingNetworkManifest {
     startBlock: number;
     sources: readonly IndexingSource[];
 }
+export interface IndexingMaterialization {
+    name: string;
+    description: string;
+    key: "chainId:lowercase-address";
+    fields: Record<string, {
+        type: "String" | "BigInt";
+        required: boolean;
+    }>;
+    updates: readonly {
+        contract: IndexingContractName;
+        event: string;
+        keyParameter: string;
+        set: Record<string, {
+            parameter: string;
+        } | {
+            blockNumber: true;
+        }>;
+    }[];
+}
 export declare const launchOnBlockEventCatalog: {
     schemaVersion: 1;
     coverage: "public_integration_events";
     abiRevision: "sha256:635cf660979631c57c4fa5cdf28460f8a4293272ebe153f0064e3758c6a5b9be";
+    materializations: readonly IndexingMaterialization[];
     contracts: IndexingContractDefinition[];
 };
 export declare function getIndexingManifest(chainId: number): IndexingNetworkManifest;

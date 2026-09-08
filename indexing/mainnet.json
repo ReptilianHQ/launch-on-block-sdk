@@ -806,64 +806,6 @@
           }
         }
       ]
-    },
-    {
-      "schemaVersion": 1,
-      "coverage": "public_integration_events",
-      "caip2": "eip155:46630",
-      "chainId": 46630,
-      "network": "robinhood-chain-testnet",
-      "deploymentId": "46630:launchpad:0x9fe4f17b53a520c4c8672c945285574a7396340f:92793378",
-      "releaseId": "gen-12",
-      "abiRevision": "sha256:635cf660979631c57c4fa5cdf28460f8a4293272ebe153f0064e3758c6a5b9be",
-      "startBlock": 92793378,
-      "sources": [
-        {
-          "contract": "Launchpad",
-          "kind": "fixed",
-          "address": "0x9fe4f17B53A520C4C8672C945285574a7396340f",
-          "startBlock": 92793378,
-          "discoveredBy": null
-        },
-        {
-          "contract": "Router",
-          "kind": "fixed",
-          "address": "0xF06E880A714Cb8683850A29d435B86Bd9F14523d",
-          "startBlock": 92793378,
-          "discoveredBy": null
-        },
-        {
-          "contract": "FeeController",
-          "kind": "fixed",
-          "address": "0x19809B400D7d160fC71A261F8415B29556E63487",
-          "startBlock": 92793378,
-          "discoveredBy": null
-        },
-        {
-          "contract": "LaunchToken",
-          "kind": "dynamic",
-          "address": null,
-          "startBlock": null,
-          "discoveredBy": {
-            "contract": "Launchpad",
-            "event": "LaunchCreated",
-            "addressParameter": "token",
-            "startFrom": "discovery-block"
-          }
-        },
-        {
-          "contract": "GraduationPool",
-          "kind": "dynamic",
-          "address": null,
-          "startBlock": null,
-          "discoveredBy": {
-            "contract": "Launchpad",
-            "event": "Graduated",
-            "addressParameter": "pool",
-            "startFrom": "discovery-block"
-          }
-        }
-      ]
     }
   ]
 }

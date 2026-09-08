@@ -752,64 +752,6 @@
     {
       "schemaVersion": 1,
       "coverage": "public_integration_events",
-      "caip2": "eip155:4663",
-      "chainId": 4663,
-      "network": "robinhood-chain-mainnet",
-      "deploymentId": "4663:launchpad:0x135492b3ccb2cb64749f91332f929f49a1deed3f:17957183",
-      "releaseId": "gen-12",
-      "abiRevision": "sha256:635cf660979631c57c4fa5cdf28460f8a4293272ebe153f0064e3758c6a5b9be",
-      "startBlock": 17957183,
-      "sources": [
-        {
-          "contract": "Launchpad",
-          "kind": "fixed",
-          "address": "0x135492B3cCb2cb64749F91332F929F49a1DeeD3F",
-          "startBlock": 17957183,
-          "discoveredBy": null
-        },
-        {
-          "contract": "Router",
-          "kind": "fixed",
-          "address": "0xf3FCB520dEF7473f0eeB473a73Cade20A2EB1f4a",
-          "startBlock": 17957183,
-          "discoveredBy": null
-        },
-        {
-          "contract": "FeeController",
-          "kind": "fixed",
-          "address": "0xbD885463e6e0F24eE467f173719a7330ADE1Ca01",
-          "startBlock": 17957183,
-          "discoveredBy": null
-        },
-        {
-          "contract": "LaunchToken",
-          "kind": "dynamic",
-          "address": null,
-          "startBlock": null,
-          "discoveredBy": {
-            "contract": "Launchpad",
-            "event": "LaunchCreated",
-            "addressParameter": "token",
-            "startFrom": "discovery-block"
-          }
-        },
-        {
-          "contract": "GraduationPool",
-          "kind": "dynamic",
-          "address": null,
-          "startBlock": null,
-          "discoveredBy": {
-            "contract": "Launchpad",
-            "event": "Graduated",
-            "addressParameter": "pool",
-            "startFrom": "discovery-block"
-          }
-        }
-      ]
-    },
-    {
-      "schemaVersion": 1,
-      "coverage": "public_integration_events",
       "caip2": "eip155:46630",
       "chainId": 46630,
       "network": "robinhood-chain-testnet",

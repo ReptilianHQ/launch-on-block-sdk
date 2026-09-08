@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Generate canonical indexing logs and identity records with tested Envio startup and durable restart.
+- Enforce indexing conformance, starter compilation, and generated artifact drift before release.
+
 ### Indexing integration
 
 - Document indexing recovery boundaries and test discovery receipts, duplicate ingestion, restart, and rollback.

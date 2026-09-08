@@ -10,13 +10,53 @@ newer than the published package; the recovery example below is unreleased.
 
 The current coverage is `public_integration_events`: Launchpad, Router,
 FeeController, LaunchToken, and GraduationPool. It does not promise every
-administrative contract or dependency event. The generated Envio and The Graph
-starters are starting points. They have not been validated here by running a
-complete hosted backfill, restart, or live reorg. In particular, the current
-Envio starter has not yet adopted the shared SDK standard's normalized event
-log and owner-declared materialized entities. CI does compile the exact-pinned
-Envio and The Graph starters; that checks generated code, not live indexing.
-The standard's aggregate/release indexing-check wiring also remains pending.
+administrative contract or dependency event. The generated Envio starter now
+uses one normalized `LobProtocolEvent` log and the catalog-defined `LobLaunch`
+and `LobPool` read models. All events retain lossless JSON payloads and complete
+chain/block/transaction provenance. The Graph remains an optional per-event
+starter; it does not share the Envio schema migration.
+
+Envio compilation, generator drift/behavior tests, packed exports, and the
+vendored indexing conformance checker run in normal checks and before publishing.
+The [live smoke evidence](envio-smoke-2026-09-08.json) proves a three-block public
+RPC backfill and persisted PostgreSQL restart with Envio 3.2.1. It does not prove
+a complete deployment backfill or acceptance on the integrating team's provider.
+
+### Envio schema migration
+
+Existing starter databases require a fresh replay into a new database/schema.
+Do not point the new schema at production and reset it in place. Keep the old
+indexer serving while replaying the new schema, compare the resulting bounded
+history and consumer queries, then switch consumers explicitly.
+
+`LobLaunch` joins `LaunchCreated`, `CurveSelected`, and `Graduated` by chain/token.
+Fields absent from available evidence stay null; joins preserve fields from the
+other events regardless of order. Conflicting immutable identity/terms fail the
+handler. `LobPool` records only membership proven by `Graduated`; it does not
+infer reserves or token ordering. These small read models deliberately avoid
+volume counters, balances, or price calculations that need broader evidence.
+
+Normalized event IDs contain chain ID, block hash and log index. Reorg rollback
+must remove orphaned event rows and materialized updates together; Envio's
+`rollback_on_reorg` setting is enabled. Fixture rollback is tested separately;
+no live reorg is claimed by this smoke.
+
+To reproduce the disposable Docker/Postgres smoke after installing the starter:
+
+```sh
+npm run check:envio-example
+node scripts/smoke-envio.mjs /tmp/lob-envio-evidence.json
+```
+
+This command reads public mainnet blocks 18582638–18582640, creates only its own
+localhost PostgreSQL container, compares all four discovery-transaction events,
+restarts without resetting the database, and checks exact serialized state
+identity. It removes its own container and temporary files on exit. It does not
+connect to your application database or run during CI/release. Docker and its
+`postgres:17-alpine` image are required. The smoke uses the invoking Node runtime;
+the maintained starter's runtime recommendation remains Node 22. Envio's
+[environment-variable reference](https://docs.envio.dev/docs/HyperIndex/environment-variables)
+describes provider and local database configuration.
 
 ## Sources and discovery
 
@@ -99,7 +139,7 @@ synthetic; it is not evidence of an observed chain reorg.
 
 The example recomputes state from its journal, so it is deliberately unsuitable
 for an unbounded backfill. It records no block timestamp or materialized domain
-entities and does not establish full Envio-standard conformance. Its checkpoint
+entities and is independent of the generated Envio conformance tests. Its checkpoint
 is the last processed **receipt**, not a claim that a block is complete. Resume
 at that block and deduplicate; never skip to the next block based on it alone.
 Exact duplicate receipts must have the same representation; normalize provider
