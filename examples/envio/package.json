@@ -12,7 +12,7 @@
     "start": "envio dev"
   },
   "devDependencies": {
-    "envio": "3.2.1",
+    "envio": "3.8.0",
     "typescript": "7.0.2"
   }
 }
