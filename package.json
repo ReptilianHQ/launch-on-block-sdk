@@ -122,7 +122,7 @@
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
-    "@hegeldev/hegel": "0.4.3",
+    "@hegeldev/hegel": "0.4.7",
     "@types/node": "24.13.2",
     "publint": "^0.3.22",
     "typescript": "^7.0.2",
